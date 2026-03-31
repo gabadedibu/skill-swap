@@ -12,6 +12,8 @@ import { FiMail, FiLock } from "react-icons/fi";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { motion } from "framer-motion";
 import {jwtDecode} from 'jwt-decode'; // Added this line
+import { Link } from "react-router-dom";
+
 
 const LoginPage = () => {
   const dispatch = useDispatch();
@@ -43,7 +45,7 @@ const LoginPage = () => {
     // API call
     dispatch(loginStart());
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", {
+      const response = await axios.post("https://skill-swap-9y9h.onrender.com/", {
         email,
         password,
       });
@@ -168,12 +170,13 @@ const LoginPage = () => {
           <div className="text-center mt-4">
             <p className="text-sm sm:text-base md:text-lg text-white">
               Don't have an account?{" "}
-              <a href="/register" className="underline hover:text-gray-200">
-                Register here
-              </a>
+                <Link to="/register" className="underline hover:text-gray-200">
+  Register here
+</Link>
             </p>
           </div>
         </div>
+     
       </motion.div>
 
       {/* Right: Background Image Animation */}
