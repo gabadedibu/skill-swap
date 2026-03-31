@@ -30,3 +30,4 @@ dist-ssr
 
 # Optional: TypeScript or JavaScript transpiler output
 *.tsbuildinfo
+.vercel
