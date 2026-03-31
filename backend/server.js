@@ -58,21 +58,7 @@ setNotificationSocketIO(notificationSocket);
 // Use body parsing for both JSON and URL encoded data
 app.use(express.json());  // For parsing application/json
 app.use(express.urlencoded({ extended: true }));  // For parsing application/x-www-form-urlencoded
-const corsOptions = {
-  origin: [
-    'http://localhost:5173',
-    'https://skill-swap-virid.vercel.app'
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
-  credentials: true
-};
-
-// 🔥 IMPORTANT: MUST come BEFORE routes
-app.use(cors(corsOptions));
-
-// 🔥 CRITICAL: handle preflight requests FIRST
-app.options('*', cors(corsOptions));
+app.use(cors());
 
 // Serve static files (images) from 'uploads' folder
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -82,7 +68,6 @@ app.use(
   '/uploads/profile-pictures',
   express.static(path.join(__dirname, 'uploads/profile-pictures'))
 );
-
 
 // Serve media files from 'message-uploads' folder
 app.use('/uploads/message-uploads', express.static(path.join(__dirname, 'uploads')));
