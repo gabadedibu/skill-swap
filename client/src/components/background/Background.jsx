@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./background.css";
+import "./Background.css";
 
 const colors = [
   ["from-white/70", "to-blue-100"],
