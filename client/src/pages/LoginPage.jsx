@@ -45,6 +45,10 @@ const LoginPage = () => {
     // API call
     dispatch(loginStart());
     try {
+//       axios.post("https://skill-swap-9y9h.onrender.com/api/auth/login", {
+//   email,
+//   password
+// });
       const response = await axios.post("https://skill-swap-api.onrender.com/api/auth/login", {
         email,
         password,

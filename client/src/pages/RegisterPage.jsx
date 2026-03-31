@@ -43,13 +43,18 @@ const RegisterPage = () => {
 
     try {
       const response = await axios.post(
-        "https://skill-swap-9y9h.onrender.com/",
+        "https://skill-swap-api.onrender.com/api/auth/register",
         {
           name,
           email,
           password,
         }
       );
+//       axios.post("https://skill-swap-9y9h.onrender.com/api/auth/register", {
+//   name,
+//   email,
+//   password
+// });
       setSuccessMessage("Registration successful! Please log in.");
 
       // Clear the fields after successful registration
