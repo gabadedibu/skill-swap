@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import AdminNavbar from '../components/admin/Navbar';
-import AdminSideBar from '../components/admin/AdminSideBar';
+import AdminSideBar from "../components/admin/AdminSideBar";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProfile } from '../redux/slices/adminProfileSlice';
 
@@ -33,7 +33,7 @@ const AdminDashboardPage = () => {
       />
 
       <div className="flex pt-16 transition-all duration-300">
-        {sidebarOpen && <AdminSidebar />}
+        {sidebarOpen && <AdminSideBar />}
 
         <main
           className={`flex-1 p-6 overflow-y-auto max-h-[calc(100vh-4rem)] transition-all duration-300 ${sidebarOpen ? 'ml-0 md:ml-0' : ''
