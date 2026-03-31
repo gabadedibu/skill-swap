@@ -58,15 +58,33 @@ setNotificationSocketIO(notificationSocket);
 // Use body parsing for both JSON and URL encoded data
 app.use(express.json());  // For parsing application/json
 app.use(express.urlencoded({ extended: true }));  // For parsing application/x-www-form-urlencoded
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://skill-swap-virid.vercel.app'
+];
+
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://skill-swap-virid.vercel.app'
-  ],
+  origin: function (origin, callback) {
+    // allow tools like Postman (no origin)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
   credentials: true
 }));
+app.options('*', cors());
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  next();
+});
 
 // Serve static files (images) from 'uploads' folder
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
