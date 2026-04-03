@@ -9,21 +9,19 @@ import { FaPaperPlane, FaSearch } from 'react-icons/fa';
 import MatchList from '../components/MatchList';
 import SessionSchedulingModal from '../components/session/SessionSchedulingModal';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Make sure to import the CSS
+import 'react-toastify/dist/ReactToastify.css';
 import Footer from "../components/footer/Footer";
+import "./SkillMatchingPage.css";
 
 const SkillMatchingPage = () => {
   const [matches, setMatches] = useState([]);
-  const [ratings, setRatings] = useState({});  // To store ratings for each match
+  const [ratings, setRatings] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sessionDetails, setSessionDetails] = useState({});
   const navigate = useNavigate();
-  const [errorMessages, setErrorMessages] = useState({
-    date: '',
-    time: '',
-  });
+  const [errorMessages, setErrorMessages] = useState({ date: '', time: '' });
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -40,17 +38,13 @@ const SkillMatchingPage = () => {
           headers: { 'x-auth-token': token },
         });
 
-        // Log the fetched data from backend
         console.log('Fetched Matches:', response.data);
-
-        // Set the matches directly from the backend
         setMatches(response.data);
 
-        // Fetch the average rating for each match's user
         const ratingsPromises = response.data.map(async (match) => {
-          const userId = match.user._id;  // Get the userId of the match
+          const userId = match.user._id;
           const ratingResponse = await axios.get(`http://localhost:5000/api/sessions/ratings/${userId}`, {
-            headers: { 'x-auth-token': token },  // Make sure the token is sent here as well
+            headers: { 'x-auth-token': token },
           });
           return { userId, averageRating: ratingResponse.data.averageRating };
         });
@@ -82,60 +76,49 @@ const SkillMatchingPage = () => {
   const sendSessionRequest = async (userId) => {
     const token = localStorage.getItem('token');
     const { date, time } = sessionDetails[userId] || {};
-
-    const skill = matches.find(match => match.user._id === userId)?.teachSkill;  // Get the matched skill
+    const skill = matches.find(match => match.user._id === userId)?.teachSkill;
 
     const newErrorMessages = { ...errorMessages };
-  
-    // Reset previous errors for this user
     newErrorMessages[userId] = {};
-  
-    // Date validation: check if date is selected
+
     if (!date) {
       newErrorMessages[userId].date = 'Please select a date';
     } else {
-      // Date validation: should not be in the past
       const today = new Date();
-      const selectedDate = new Date(date + "T00:00:00"); // force midnight to avoid timezone issues
-  
+      const selectedDate = new Date(date + "T00:00:00");
       if (selectedDate < today.setHours(0, 0, 0, 0)) {
         newErrorMessages[userId].date = 'Selected date is in the past';
       }
     }
+
     setSessionDetails((prev) => ({
       ...prev,
-      [userId]: {
-        date: '',
-        time: '',
-      },
+      [userId]: { date: '', time: '' },
     }));
-    // Time validation: check if time is selected
+
     if (!time) {
       newErrorMessages[userId].time = 'Please select a time';
     } else {
-      // Time validation: should not be in the past
       const today = new Date();
-      const selectedDate = new Date(date + "T00:00:00"); // force midnight to avoid timezone issues
-  
+      const selectedDate = new Date(date + "T00:00:00");
       if (selectedDate.getTime() === today.setHours(0, 0, 0, 0) && time && new Date(`${date}T${time}`).getTime() < Date.now()) {
         newErrorMessages[userId].time = 'Selected time is in the past';
       }
     }
-  
+
     setErrorMessages(newErrorMessages);
-  
-    // If any error exists for this user (either date or time), stop the request
+
     if (newErrorMessages[userId]?.date || newErrorMessages[userId]?.time) {
       return;
     }
-  
+
     try {
       await axios.post(
         'http://localhost:5000/api/sessions/request',
         { userId2: userId, sessionDate: date, sessionTime: time, skill },
         { headers: { 'x-auth-token': token } }
       );
-  
+
       await axios.post(
         'http://localhost:5000/api/notifications/send',
         {
@@ -145,19 +128,19 @@ const SkillMatchingPage = () => {
         },
         { headers: { 'x-auth-token': token } }
       );
-  
+
       toast.success('Session request sent successfully!', {
         autoClose: 2000,
         style: {
-          background: 'linear-gradient(to right bottom, #3b82f6, #2563eb)',
+          background: 'linear-gradient(135deg, #6366f1, #818cf8)',
           color: '#ffffff',
-          fontWeight: 'bold',
-          padding: '10px',
-          borderRadius: '8px',
+          fontWeight: '500',
+          padding: '12px 16px',
+          borderRadius: '12px',
         },
         progressStyle: {
-          background: '#1E3A8A',
-          height: '4px',
+          background: 'rgba(255,255,255,0.4)',
+          height: '3px',
           borderRadius: '2px',
         },
         icon: false,
@@ -167,153 +150,156 @@ const SkillMatchingPage = () => {
       toast.error('Error sending session request. Please try again.');
     }
   };
-  
-  return (
-    <div className="min-h-screen relative">
-      <Background />
-      <div className="relative z-10">
-        <Navbar />
-        <div className="container mx-auto px-4 md:px-8 py-10">
-          <h1 className="text-4xl font-bold text-center text-white mb-4">Skill Matching</h1>
-          <p className="text-center text-white mb-6 max-w-2xl mx-auto font-semibold italic">
-            Browse your matches and schedule a session to share your skills.
-          </p>
 
-          {/* 🌟 Search Bar */}
-          <div className="relative max-w-md mx-auto mb-10">
-            <input
-              type="text"
-              placeholder="Search by name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full py-3 pl-12 pr-4 rounded-xl bg-white/10 text-white placeholder-white text-italics backdrop-blur-md border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#4361ee] shadow-lg"
-            />
-            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-700" />
+  return (
+    <div className="smp-root">
+      <Background />
+      <div className="smp-grid" />
+      <div className="smp-orb" />
+
+      <div className="smp-content">
+        <Navbar />
+
+        <div className="smp-inner">
+          {/* Header */}
+          <div className="smp-header">
+            <span className="smp-eyebrow">
+              <span className="smp-eyebrow-dot" />
+              Peer Matching
+            </span>
+            <h1 className="smp-title">Skill Matching</h1>
+            <p className="smp-subtitle">
+              Browse your matches and schedule a session to share your skills.
+            </p>
           </div>
 
-          {/* 💡 Filtered User Cards */}
-          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+          {/* Search */}
+          <div className="smp-search-wrap">
+            <FaSearch className="smp-search-icon" />
+            <input
+              type="text"
+              placeholder="Search by name or skill..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="smp-search-input"
+            />
+          </div>
+
+          {/* Cards grid */}
+          <div className="smp-grid-cards">
             {matches.length > 0 ? (
               matches
                 .filter((match) =>
-                  match.user.name.toLowerCase().includes(searchQuery.toLowerCase()) || // Match skill
-                  match.teachSkill.toLowerCase().includes(searchQuery.toLowerCase()) // Match name
+                  match.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  match.teachSkill.toLowerCase().includes(searchQuery.toLowerCase())
                 )
                 .map((match) => (
-                  <div
-                    key={`${match.user._id}-${match.teachSkill}`} // Use a unique key
-                    className="bg-gradient-to-br from-blue-400 via-blue-300 to-blue-200 rounded-2xl shadow-lg p-6 min-h-[22rem] flex flex-col justify-between transition-shadow duration-300 hover:shadow-2xl">
-                    {/* User profile and skill display */}
-                    <div className="flex items-center gap-4 mb-4">
+                  <div key={`${match.user._id}-${match.teachSkill}`} className="smp-card">
+                    {/* Top shimmer */}
+                    <div className="smp-card-bar" />
+
+                    {/* User header */}
+                    <div className="smp-card-header">
                       <img
-                        className="w-14 h-14 rounded-full border border-white/20"
-                        src={match.user?.profilePicture ? `http://localhost:5000/uploads/profile-pictures/${match.user.profilePicture}` : '/default-avatar.png'}
+                        className="smp-avatar"
+                        src={match.user?.profilePicture
+                          ? `http://localhost:5000/uploads/profile-pictures/${match.user.profilePicture}`
+                          : '/default-avatar.png'}
                         alt="Avatar"
                       />
-                      <div className="w-full">
-                        <div className="flex flex-wrap items-center justify-between">
-                          <h3 className="text-lg font-bold tracking-wide text-white">{match.user.name}</h3>
-                          <p className="text-base text-white font-extrabold uppercase tracking-wide">{match.teachSkill}</p> {/* White, bolder, and uppercase */}
+                      <div className="smp-card-user">
+                        <div className="smp-card-name-row">
+                          <span className="smp-card-name">{match.user.name}</span>
+                          <span className="smp-skill-badge">{match.teachSkill}</span>
                         </div>
-                        <div className="flex justify-between items-center mt-1">
-                          <p className="text-sm text-white opacity-80">{match.user.status || ''}</p>
-                          {/* Display dynamic average rating */}
-                          <p className="text-sm text-yellow-300 font-semibold text-right">{ratings[match.user._id] || 'N/A'} 🌟</p>
+                        <div className="smp-card-meta">
+                          <span className="smp-card-status">{match.user.status || ''}</span>
+                          <span className="smp-card-rating">
+                            {ratings[match.user._id] || 'N/A'} ★
+                          </span>
                         </div>
                       </div>
                     </div>
 
-                  <div className="space-y-2 text-sm font-medium tracking-wide text-indigo-100">
-                    <label className="block">
-                      Date:
-                      <input
-                        type="date"
-                        value={sessionDetails[match.user._id]?.date || ''}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                        
-                          setSessionDetails((prev) => ({
-                            ...prev,
-                            [match.user._id]: {
-                              ...prev[match.user._id],
-                              date: value,
-                            },
-                          }));
-                        
-                          // ✅ Clear error if date selected
-                          setErrorMessages((prev) => ({
-                            ...prev,
-                            [match.user._id]: {
-                              ...prev[match.user._id],
-                              date: value ? '' : prev[match.user._id]?.date,
-                            },
-                          }));
-                        }}
-                        
-                        className="w-full mt-1 px-4 py-2 bg-white/20 text-white placeholder-white/70 border border-white/30 rounded-lg backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-[#4361ee] transition"
-                      />
-                      {/* Show error message for the specific user */}
-                      {errorMessages[match.user._id]?.date && (
-                        <p className="text-red-500 text-xs">{errorMessages[match.user._id].date}</p>
-                      )}
-                    </label>
-                    <label className="block">
-                      Time:
-                      <input
-                        type="time"
-                        value={sessionDetails[match.user._id]?.time || ''}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                        
-                          setSessionDetails((prev) => ({
-                            ...prev,
-                            [match.user._id]: {
-                              ...prev[match.user._id],
-                              time: value,
-                            },
-                          }));
-                        
-                          // ✅ Clear error if time selected
-                          setErrorMessages((prev) => ({
-                            ...prev,
-                            [match.user._id]: {
-                              ...prev[match.user._id],
-                              time: value ? '' : prev[match.user._id]?.time,
-                            },
-                          }));
-                        }}
-                        
-                        className="w-full mt-1 px-4 py-2 bg-white/20 text-white placeholder-white/70 border border-white/30 rounded-lg backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-[#4361ee] transition"
-                      />
-                      {/* Show error message for the specific user */}
-                      {errorMessages[match.user._id]?.time && (
-                        <p className="text-red-500 text-xs mt-1">{errorMessages[match.user._id].time}</p>
+                    {/* Divider */}
+                    <div className="smp-card-divider" />
 
-                      )}
-                    </label>
-                  </div>
-                  
-                  <div className="mt-4 space-y-2">
+                    {/* Date & Time */}
+                    <div className="smp-fields">
+                      <div className="smp-field-group">
+                        <label className="smp-label">Date</label>
+                        <input
+                          type="date"
+                          value={sessionDetails[match.user._id]?.date || ''}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setSessionDetails((prev) => ({
+                              ...prev,
+                              [match.user._id]: { ...prev[match.user._id], date: value },
+                            }));
+                            setErrorMessages((prev) => ({
+                              ...prev,
+                              [match.user._id]: {
+                                ...prev[match.user._id],
+                                date: value ? '' : prev[match.user._id]?.date,
+                              },
+                            }));
+                          }}
+                          className="smp-input"
+                        />
+                        {errorMessages[match.user._id]?.date && (
+                          <p className="smp-error">{errorMessages[match.user._id].date}</p>
+                        )}
+                      </div>
+
+                      <div className="smp-field-group">
+                        <label className="smp-label">Time</label>
+                        <input
+                          type="time"
+                          value={sessionDetails[match.user._id]?.time || ''}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setSessionDetails((prev) => ({
+                              ...prev,
+                              [match.user._id]: { ...prev[match.user._id], time: value },
+                            }));
+                            setErrorMessages((prev) => ({
+                              ...prev,
+                              [match.user._id]: {
+                                ...prev[match.user._id],
+                                time: value ? '' : prev[match.user._id]?.time,
+                              },
+                            }));
+                          }}
+                          className="smp-input"
+                        />
+                        {errorMessages[match.user._id]?.time && (
+                          <p className="smp-error">{errorMessages[match.user._id].time}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Send button */}
                     <button
                       onClick={() => sendSessionRequest(match.user._id)}
-                      className="flex items-center justify-center gap-2 w-full py-2 bg-white text-[#4361ee] border border-[#4361ee] hover:bg-[#f0f0f0] rounded-xl font-semibold transition duration-200"
+                      className="smp-send-btn"
                     >
-                      <FaPaperPlane className="text-[#4361ee]" /> Send Session Request
+                      <FaPaperPlane className="smp-send-icon" />
+                      Send Session Request
                     </button>
                   </div>
-                </div>
-              ))
+                ))
             ) : (
-              <div className="text-center text-white font-bold">No Matches Found</div>
+              <div className="smp-empty">No matches found</div>
             )}
           </div>
-          <ToastContainer /> {/* Add ToastContainer here */}
-        </div>
 
+          <ToastContainer />
+        </div>
       </div>
+
       <Footer />
-      </div>
-      
+    </div>
   );
 };
 

@@ -11,6 +11,7 @@ import defaultAvatar from '../assets/avatar.jpeg';
 import Background from '../components/background/Background';
 import '../components/background/Background.css';
 import Footer from '../components/footer/Footer';
+import './ProfileSettingsPage.css';
 
 const ProfileSettingsPage = () => {
   const [formData, setFormData] = useState({
@@ -30,20 +31,19 @@ const ProfileSettingsPage = () => {
     confirmNewPasswordVisible: false
   });
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('success');
   const [imagePreview, setImagePreview] = useState(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Fetch profile data
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('token');
       try {
-        const res = await axios.get(
-          'http://localhost:5000/api/users/profile',
-          { headers: { 'x-auth-token': token } }
-        );
+        const res = await axios.get('http://localhost:5000/api/users/profile', {
+          headers: { 'x-auth-token': token }
+        });
         const data = res.data;
         setFormData({
           name: data.name || '',
@@ -54,91 +54,77 @@ const ProfileSettingsPage = () => {
           skillsToLearn: data.skillsToLearn ? data.skillsToLearn.join(', ') : ''
         });
         if (data.profilePicture) {
-          setImagePreview(
-            `http://localhost:5000/uploads/profile-pictures/${data.profilePicture}`
-          );
+          setImagePreview(`http://localhost:5000/uploads/profile-pictures/${data.profilePicture}`);
         }
       } catch {
         setMessage('Failed to load profile data.');
+        setMessageType('error');
       }
     };
     fetchProfile();
   }, []);
 
-  // Determine which avatar to show
   const avatarSrc = imagePreview
     ? imagePreview
     : formData.profilePicture
     ? `http://localhost:5000/uploads/profile-pictures/${formData.profilePicture}`
     : defaultAvatar;
 
-  // Handle profile update
+  const handleUpdate = async () => {
+    const payload = new FormData();
+    payload.append('name', formData.name);
+    payload.append('status', formData.status);
 
-const handleUpdate = async () => {
-  const payload = new FormData();
-  payload.append('name', formData.name);
-  payload.append('status', formData.status);
+    const skillsToTeachArray = formData.skillsToTeach.split(',').map(s => s.trim()).filter(s => s !== '');
+    const skillsToLearnArray = formData.skillsToLearn.split(',').map(s => s.trim()).filter(s => s !== '');
 
-  // Add each skill as a separate field in FormData
-  const skillsToTeachArray = formData.skillsToTeach.split(',').map((s) => s.trim()).filter((s) => s !== ''); // Create an array of skills
-  const skillsToLearnArray = formData.skillsToLearn.split(',').map((s) => s.trim()).filter((s) => s !== ''); // Create an array of skills
+    skillsToTeachArray.forEach(skill => payload.append('skillsToTeach[]', skill));
+    skillsToLearnArray.forEach(skill => payload.append('skillsToLearn[]', skill));
 
-  // Append each skill separately to FormData
-  skillsToTeachArray.forEach((skill, index) => {
-    payload.append('skillsToTeach[]', skill); // The '[]' syntax will ensure they are treated as an array
-  });
+    payload.append('socials[linkedin]', formData.socials.linkedin);
+    payload.append('socials[facebook]', formData.socials.facebook);
+    payload.append('socials[twitter]', formData.socials.twitter);
 
-  skillsToLearnArray.forEach((skill, index) => {
-    payload.append('skillsToLearn[]', skill); // Same for skillsToLearn
-  });
+    if (formData.profilePicture instanceof File) {
+      payload.append('profilePicture', formData.profilePicture);
+    }
 
-  // Add socials and profile picture as usual
-  payload.append('socials[linkedin]', formData.socials.linkedin);
-  payload.append('socials[facebook]', formData.socials.facebook);
-  payload.append('socials[twitter]', formData.socials.twitter);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.put('http://localhost:5000/api/users/profile', payload, {
+        headers: { 'x-auth-token': token, 'Content-Type': 'multipart/form-data' }
+      });
+      dispatch(setUser(res.data));
+      setMessage('Profile updated successfully!');
+      setMessageType('success');
+      navigate('/profile');
+    } catch {
+      setMessage('Update failed. Please try again.');
+      setMessageType('error');
+    }
+  };
 
-  if (formData.profilePicture instanceof File) {
-    payload.append('profilePicture', formData.profilePicture);
-  }
-
-  try {
-    const token = localStorage.getItem('token');
-    const res = await axios.put('http://localhost:5000/api/users/profile', payload, {
-      headers: {
-        'x-auth-token': token,
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    dispatch(setUser(res.data));
-    setMessage('Profile updated successfully!');
-    navigate('/profile');
-  } catch {
-    setMessage('Update failed. Please try again.');
-  }
-};
-  // Handle password change
   const handlePasswordChange = async () => {
     if (passwords.newPassword !== passwords.confirmNewPassword) {
       setMessage("Passwords don't match!");
+      setMessageType('error');
       return;
     }
     try {
       const token = localStorage.getItem('token');
       await axios.put(
         'http://localhost:5000/api/users/change-password',
-        {
-          currentPassword: passwords.currentPassword,
-          newPassword: passwords.newPassword
-        },
+        { currentPassword: passwords.currentPassword, newPassword: passwords.newPassword },
         { headers: { 'x-auth-token': token } }
       );
       setMessage('Password updated successfully!');
+      setMessageType('success');
     } catch {
       setMessage('Password update failed. Please try again.');
+      setMessageType('error');
     }
   };
 
-  // Handle image upload & preview
   const handleImageUpload = e => {
     const file = e.target.files[0];
     if (file) {
@@ -147,244 +133,167 @@ const handleUpdate = async () => {
     }
   };
 
-  return (
-    <div className="min-h-screen relative">
-      {/* Background layer */}
-      <Background />
+  const passwordFields = [
+    { key: 'currentPassword', placeholder: 'Current password', visibleKey: 'currentPasswordVisible', label: 'Current Password', id: 'currentPassword' },
+    { key: 'newPassword', placeholder: 'New password', visibleKey: 'newPasswordVisible', label: 'New Password', id: 'newPassword' },
+    { key: 'confirmNewPassword', placeholder: 'Confirm new password', visibleKey: 'confirmNewPasswordVisible', label: 'Confirm New Password', id: 'confirmNewPassword' }
+  ];
 
-      {/* Foreground content */}
-      <div className="relative z-10 bg-transparent">
+  return (
+    <div className="psp-root">
+      <Background />
+      <div className="psp-grid" />
+      <div className="psp-orb" />
+
+      <div className="psp-content">
         <Navbar />
 
-        <div className="bg-gradient-to-br from-blue-400 via-blue-300 to-blue-200 max-w-xl mx-auto p-6 shadow-lg rounded-xl mt-6">
-          <h2 className="text-2xl font-bold mb-4 text-white">Edit Profile</h2>
-          {message && <div className="mb-4 text-green-600">{message}</div>}
+        <div className="psp-inner">
+          {/* Page title */}
+          <div className="psp-page-header">
+            <span className="psp-eyebrow"><span className="psp-eyebrow-dot" />Settings</span>
+            <h1 className="psp-page-title">Edit Profile</h1>
+          </div>
 
-          {/* Avatar + Upload */}
-          <div className="mb-6 flex justify-center">
-            <label htmlFor="profilePicture" className="cursor-pointer">
-              <div className="w-32 h-32 rounded-full bg-gray-300 flex items-center justify-center relative overflow-hidden">
-                <img
-                  src={avatarSrc}
-                  alt="Profile"
-                  className="w-full h-full object-cover rounded-full"
-                />
-                <div className="absolute top-0 right-0 m-1">
-                  <FaEdit className="text-white bg-gray-700 rounded-full p-1.5 cursor-pointer hover:bg-blue-500 transition" />
-                </div>
+          <div className="psp-card">
+            <div className="psp-card-bar" />
+
+            {/* Feedback message */}
+            {message && (
+              <div className={`psp-message ${messageType === 'error' ? 'psp-message--error' : 'psp-message--success'}`}>
+                <span className="psp-message-dot" />
+                {message}
               </div>
-            </label>
-            <input
-              type="file"
-              id="profilePicture"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageUpload}
-            />
-          </div>
+            )}
 
-          {/* Form fields */}
-          <div className="space-y-6">
-            {/* Name */}
-            <div>
-              <label htmlFor="name" className="block mb-1 font-semibold text-gray-700">
-                Name
-              </label>
-              <input
-                id="name"
-                type="text"
-                placeholder="Name"
-                value={formData.name}
-                onChange={e =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                className="w-full p-3 border rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-
-            {/* Status */}
-            <div>
-              <label htmlFor="status" className="block mb-1 font-semibold text-gray-700">
-                Status
-              </label>
-              <input
-                id="status"
-                type="text"
-                placeholder="Status"
-                value={formData.status}
-                onChange={e =>
-                  setFormData({ ...formData, status: e.target.value })
-                }
-                className="w-full p-3 border rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-
-            {/* LinkedIn URL */}
-            <div>
-              <label htmlFor="linkedin" className="block mb-1 font-semibold text-gray-700">
-                LinkedIn URL
-              </label>
-              <input
-                id="linkedin"
-                type="text"
-                placeholder="LinkedIn URL"
-                value={formData.socials.linkedin}
-                onChange={e =>
-                  setFormData({
-                    ...formData,
-                    socials: { ...formData.socials, linkedin: e.target.value }
-                  })
-                }
-                className="w-full p-3 border rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-
-            {/* Facebook URL */}
-            <div>
-              <label htmlFor="facebook" className="block mb-1 font-semibold text-gray-700">
-                Facebook URL
-              </label>
-              <input
-                id="facebook"
-                type="text"
-                placeholder="Facebook URL"
-                value={formData.socials.facebook}
-                onChange={e =>
-                  setFormData({
-                    ...formData,
-                    socials: { ...formData.socials, facebook: e.target.value }
-                  })
-                }
-                className="w-full p-3 border rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-
-            {/* Twitter URL */}
-            <div>
-              <label htmlFor="twitter" className="block mb-1 font-semibold text-gray-700">
-                Twitter URL
-              </label>
-              <input
-                id="twitter"
-                type="text"
-                placeholder="Twitter URL"
-                value={formData.socials.twitter}
-                onChange={e =>
-                  setFormData({
-                    ...formData,
-                    socials: { ...formData.socials, twitter: e.target.value }
-                  })
-                }
-                className="w-full p-3 border rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-
-            {/* Skills You Can Teach */}
-            <div>
-              <label htmlFor="skillsToTeach" className="block mb-1 font-semibold text-gray-700">
-                Skills You Can Teach (comma-separated)
-              </label>
-              <input
-                id="skillsToTeach"
-                type="text"
-                placeholder="e.g. JavaScript, Design"
-                value={formData.skillsToTeach}
-                onChange={e =>
-                  setFormData({ ...formData, skillsToTeach: e.target.value })
-                }
-                className="w-full p-3 border rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-
-            {/* Skills You Want to Learn */}
-            <div>
-              <label htmlFor="skillsToLearn" className="block mb-1 font-semibold text-gray-700">
-                Skills You Want to Learn (comma-separated)
-              </label>
-              <input
-                id="skillsToLearn"
-                type="text"
-                placeholder="e.g. Go, Machine Learning"
-                value={formData.skillsToLearn}
-                onChange={e =>
-                  setFormData({ ...formData, skillsToLearn: e.target.value })
-                }
-                className="w-full p-3 border rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-          </div>
-
-          <button
-            onClick={handleUpdate}
-            className="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
-          >
-            Save Changes
-          </button>
-
-          {/* Change Password */}
-          <div className="mt-8 pt-6 border-t space-y-6">
-            {[
-              {
-                key: 'currentPassword',
-                placeholder: 'Current Password',
-                visibleKey: 'currentPasswordVisible',
-                label: 'Current Password',
-                id: 'currentPassword'
-              },
-              {
-                key: 'newPassword',
-                placeholder: 'New Password',
-                visibleKey: 'newPasswordVisible',
-                label: 'New Password',
-                id: 'newPassword'
-              },
-              {
-                key: 'confirmNewPassword',
-                placeholder: 'Confirm New Password',
-                visibleKey: 'confirmNewPasswordVisible',
-                label: 'Confirm New Password',
-                id: 'confirmNewPassword'
-              }
-            ].map(({ key, placeholder, visibleKey, label, id }) => (
-              <div key={key} className="relative">
-                <label htmlFor={id} className="block mb-1 font-semibold text-gray-700">
-                  {label}
+            {/* ── SECTION: Avatar ── */}
+            <div className="psp-section">
+              <h3 className="psp-section-title">Profile Photo</h3>
+              <div className="psp-avatar-wrap">
+                <label htmlFor="profilePicture" className="psp-avatar-label">
+                  <img src={avatarSrc} alt="Profile" className="psp-avatar-img" />
+                  <div className="psp-avatar-overlay">
+                    <FaEdit className="psp-avatar-icon" />
+                  </div>
                 </label>
                 <input
-                  id={id}
-                  type={passwords[visibleKey] ? 'text' : 'password'}
-                  placeholder={placeholder}
-                  value={passwords[key]}
-                  onChange={e =>
-                    setPasswords(prev => ({
-                      ...prev,
-                      [key]: e.target.value
-                    }))
-                  }
-                  className="w-full p-3 border rounded-lg bg-gray-100 focus:ring-2 focus:ring-blue-400"
+                  type="file"
+                  id="profilePicture"
+                  accept="image/*"
+                  className="psp-hidden"
+                  onChange={handleImageUpload}
                 />
-                <div
-                  className="absolute top-10 right-3 cursor-pointer"
-                  onClick={() =>
-                    setPasswords(prev => ({
-                      ...prev,
-                      [visibleKey]: !prev[visibleKey]
-                    }))
-                  }
-                >
-                  {passwords[visibleKey] ? (
-                    <AiOutlineEyeInvisible />
-                  ) : (
-                    <AiOutlineEye />
-                  )}
+                <p className="psp-avatar-hint">Click to upload a new photo</p>
+              </div>
+            </div>
+
+            <div className="psp-divider" />
+
+            {/* ── SECTION: Basic Info ── */}
+            <div className="psp-section">
+              <h3 className="psp-section-title">Basic Info</h3>
+              <div className="psp-fields">
+                <div className="psp-field">
+                  <label className="psp-label" htmlFor="name">Name</label>
+                  <input id="name" type="text" placeholder="Your full name" value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    className="psp-input" />
+                </div>
+                <div className="psp-field">
+                  <label className="psp-label" htmlFor="status">Status</label>
+                  <input id="status" type="text" placeholder="e.g. Available, Busy..." value={formData.status}
+                    onChange={e => setFormData({ ...formData, status: e.target.value })}
+                    className="psp-input" />
                 </div>
               </div>
-            ))}
+            </div>
 
-            <button
-              onClick={handlePasswordChange}
-              className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition"
-            >
+            <div className="psp-divider" />
+
+            {/* ── SECTION: Socials ── */}
+            <div className="psp-section">
+              <h3 className="psp-section-title">Social Links</h3>
+              <div className="psp-fields">
+                {[
+                  { id: 'linkedin', label: 'LinkedIn URL', placeholder: 'https://linkedin.com/in/...' },
+                  { id: 'facebook', label: 'Facebook URL', placeholder: 'https://facebook.com/...' },
+                  { id: 'twitter', label: 'Twitter URL', placeholder: 'https://twitter.com/...' }
+                ].map(({ id, label, placeholder }) => (
+                  <div key={id} className="psp-field">
+                    <label className="psp-label" htmlFor={id}>{label}</label>
+                    <input id={id} type="text" placeholder={placeholder}
+                      value={formData.socials[id]}
+                      onChange={e => setFormData({ ...formData, socials: { ...formData.socials, [id]: e.target.value } })}
+                      className="psp-input" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="psp-divider" />
+
+            {/* ── SECTION: Skills ── */}
+            <div className="psp-section">
+              <h3 className="psp-section-title">Skills</h3>
+              <div className="psp-fields">
+                <div className="psp-field psp-field--full">
+                  <label className="psp-label" htmlFor="skillsToTeach">Skills You Can Teach</label>
+                  <input id="skillsToTeach" type="text" placeholder="e.g. JavaScript, Design, Python"
+                    value={formData.skillsToTeach}
+                    onChange={e => setFormData({ ...formData, skillsToTeach: e.target.value })}
+                    className="psp-input" />
+                  <span className="psp-field-hint">Comma-separated</span>
+                </div>
+                <div className="psp-field psp-field--full">
+                  <label className="psp-label" htmlFor="skillsToLearn">Skills You Want to Learn</label>
+                  <input id="skillsToLearn" type="text" placeholder="e.g. Go, Machine Learning, Figma"
+                    value={formData.skillsToLearn}
+                    onChange={e => setFormData({ ...formData, skillsToLearn: e.target.value })}
+                    className="psp-input" />
+                  <span className="psp-field-hint">Comma-separated</span>
+                </div>
+              </div>
+            </div>
+
+            <button onClick={handleUpdate} className="psp-btn psp-btn--primary">
+              Save Changes
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+
+            <div className="psp-divider psp-divider--mt" />
+
+            {/* ── SECTION: Change Password ── */}
+            <div className="psp-section">
+              <h3 className="psp-section-title">Change Password</h3>
+              <div className="psp-fields">
+                {passwordFields.map(({ key, placeholder, visibleKey, label, id }) => (
+                  <div key={key} className="psp-field psp-field--full psp-field--eye">
+                    <label className="psp-label" htmlFor={id}>{label}</label>
+                    <div className="psp-eye-wrap">
+                      <input
+                        id={id}
+                        type={passwords[visibleKey] ? 'text' : 'password'}
+                        placeholder={placeholder}
+                        value={passwords[key]}
+                        onChange={e => setPasswords(prev => ({ ...prev, [key]: e.target.value }))}
+                        className="psp-input"
+                      />
+                      <button
+                        type="button"
+                        className="psp-eye"
+                        onClick={() => setPasswords(prev => ({ ...prev, [visibleKey]: !prev[visibleKey] }))}
+                      >
+                        {passwords[visibleKey] ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button onClick={handlePasswordChange} className="psp-btn psp-btn--danger">
               Change Password
             </button>
           </div>

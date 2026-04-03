@@ -4,9 +4,9 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { FiUser, FiMail, FiLock } from "react-icons/fi";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import registerImage from "../assets/auth-bg.jpg"; // Use same image as login
+import registerImage from "../assets/auth-bg.jpg";
 import { Link } from "react-router-dom";
-
+import "./RegisterPage.css";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -23,7 +23,6 @@ const RegisterPage = () => {
     setError("");
     setSuccessMessage("");
 
-    // Field validation
     if (!name.trim()) {
       setError("Please enter your full name.");
       return;
@@ -43,21 +42,10 @@ const RegisterPage = () => {
 
     try {
       const response = await axios.post(
-        "https://skill-swap-api.onrender.com/api/auth/register",
-        {
-          name,
-          email,
-          password,
-        }
+        "http://localhost:5000/api/auth/login",
+        { name, email, password }
       );
-//       axios.post("https://skill-swap-9y9h.onrender.com/api/auth/register", {
-//   name,
-//   email,
-//   password
-// });
       setSuccessMessage("Registration successful! Please log in.");
-
-      // Clear the fields after successful registration
       setName("");
       setEmail("");
       setPassword("");
@@ -68,160 +56,162 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="flex fixed inset-0 overflow-hidden">
-      {/* Left: Form and Title */}
+    <div className="reg-root">
+      {/* ── Left panel ── */}
       <motion.div
-        initial={{ y: "100%" }}
-        animate={{ y: 0 }}
-        transition={{ duration: 1, ease: "easeOut" }}
-        className="w-1/2 h-full flex flex-col justify-center items-center bg-gradient-to-br from-gray-100 via-blue-100 to-blue-200 relative z-10"
+        className="reg-left"
+        initial={{ x: "-100%", opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
       >
-        {/* Title */}
+        <div className="reg-grid" />
+        <div className="reg-glow" />
+
+        {/* Brand */}
         <motion.div
-          initial={{ y: -100, opacity: 0 }}
+          className="reg-brand"
+          initial={{ y: -24, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="text-center"
+          transition={{ delay: 0.35, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">
-            Skill Swap
-          </h1>
-          {/* Tagline */}
-          <p className="text-sm sm:text-base md:text-lg text-gray-600 italic mt-2">
-            Empower your skills. Connect. Grow.
-          </p>
+          <span className="reg-brand-name">Skill Swap</span>
+          <span className="reg-brand-sub">Empower your skills. Connect. Grow.</span>
         </motion.div>
 
-        {/* Form Box */}
-        <div className="mt-6 bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-600 rounded-3xl shadow-2xl p-8 w-[85%] max-w-md">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-center mb-4">
-            Create an Account
-          </h2>
+        {/* Card */}
+        <motion.div
+          className="reg-card"
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="reg-card-bar" />
+
+          <h2 className="reg-card-title">Create Account</h2>
+          <p className="reg-card-hint">Join the community today</p>
 
           {successMessage && (
-            <p className="text-green-400 font-bold text-center mb-4">
+            <div className="reg-success">
+              <span className="reg-success-dot" />
               {successMessage}
-            </p>
+            </div>
           )}
           {error && (
-            <p className="text-red-500 font-semibold text-center mb-3">
+            <div className="reg-error">
+              <span className="reg-error-dot" />
               {error}
-            </p>
+            </div>
           )}
 
-          <form
-            onSubmit={handleSubmit}
-            autoComplete="off"
-            className="space-y-4"
-          >
-            {/* Name Field */}
-            <div className="relative">
-              <FiUser className="absolute top-3.5 left-3 text-blue-500" />
+          <form onSubmit={handleSubmit} autoComplete="off" className="reg-form">
+            {/* Name */}
+            <div className="reg-field">
+              <FiUser className="reg-field-icon" />
               <input
                 type="text"
-                placeholder="Full Name"
+                placeholder="Full name"
                 value={name}
                 onChange={(e) => {
                   setName(e.target.value);
-                  if (error === "Please enter your full name.") setError(""); // Clear error when user starts typing
+                  if (error === "Please enter your full name.") setError("");
                 }}
                 autoComplete="off"
-                className="pl-10 pr-4 py-3 w-full rounded-full border border-gray-300 outline-none text-base text-gray-900 bg-gray-100 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-blue-500"
+                className="reg-input"
               />
             </div>
 
-            {/* Email Field */}
-            <div className="relative">
-              <FiMail className="absolute top-3.5 left-3 text-blue-500" />
+            {/* Email */}
+            <div className="reg-field">
+              <FiMail className="reg-field-icon" />
               <input
                 type="email"
-                placeholder="Email Address"
+                placeholder="Email address"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  if (error === "Please enter a valid email address.") setError(""); // Clear error when user starts typing
+                  if (error === "Please enter a valid email address.") setError("");
                 }}
                 autoComplete="off"
-                className="pl-10 pr-4 py-3 w-full rounded-full border border-gray-300 outline-none text-base text-gray-900 bg-gray-100 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-blue-500"
+                className="reg-input"
               />
             </div>
 
-            {/* Password Field */}
-            <div className="relative">
-              <FiLock className="absolute top-3.5 left-3 text-blue-500" />
+            {/* Password */}
+            <div className="reg-field">
+              <FiLock className="reg-field-icon" />
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
-                  if (error === "Password must be at least 6 characters long.") setError(""); // Clear error when user starts typing
+                  if (error === "Password must be at least 6 characters long.") setError("");
                 }}
                 autoComplete="new-password"
-                className="pl-10 pr-10 py-3 w-full rounded-full border border-gray-300 outline-none text-base text-gray-900 bg-gray-100 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-blue-500"
+                className="reg-input"
               />
-              <div
-                className="absolute top-3.5 right-3 text-blue-500 cursor-pointer"
+              <button
+                type="button"
+                className="reg-eye"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-              </div>
+              </button>
             </div>
 
-            {/* Confirm Password Field */}
-            <div className="relative">
-              <FiLock className="absolute top-3.5 left-3 text-blue-500" />
+            {/* Confirm Password */}
+            <div className="reg-field">
+              <FiLock className="reg-field-icon" />
               <input
                 type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm Password"
+                placeholder="Confirm password"
                 value={confirmPassword}
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
-                  if (error === "Passwords do not match!") setError(""); // Clear error when user starts typing
+                  if (error === "Passwords do not match!") setError("");
                 }}
                 autoComplete="new-password"
-                className="pl-10 pr-10 py-3 w-full rounded-full border border-gray-300 outline-none text-base text-gray-900 bg-gray-100 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-blue-500"
+                className="reg-input"
               />
-              <div
-                className="absolute top-3.5 right-3 text-blue-500 cursor-pointer"
+              <button
+                type="button"
+                className="reg-eye"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-              </div>
+              </button>
             </div>
 
-            <button
-              type="submit"
-              className="w-2/3 mx-auto block bg-blue-500 text-white font-semibold py-3 rounded-full border border-blue-700 hover:bg-blue-600 transition duration-300"
-            >
-              Register
+            <button type="submit" className="reg-btn">
+              <span>Register</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </button>
-
-            <div className="text-center mt-2">
-              <p className="text-white">
-                Already have an account?{" "}
-                 <Link to="/login" className="underline hover:text-gray-200">
-                  Login here
-                </Link>
-                {/* <a href="/login" className="underline hover:text-gray-200">
-                  Login here
-                </a> */}
-              </p>
-            </div>
           </form>
-        </div>
+
+          <p className="reg-login-text">
+            Already have an account?{" "}
+            <Link to="/login" className="reg-login-link">
+              Login here
+            </Link>
+          </p>
+        </motion.div>
       </motion.div>
 
-      {/* Right: Image */}
+      {/* ── Right panel ── */}
       <motion.div
-        initial={{ x: "100%" }}
-        animate={{ x: 0 }}
-        transition={{ duration: 1.2, ease: "easeOut" }}
-        className="w-1/2 h-full bg-cover bg-center"
-        style={{
-          backgroundImage: `url(${registerImage})`,
-        }}
-      ></motion.div>
+        className="reg-right"
+        initial={{ x: "100%", opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+        style={{ backgroundImage: `url(${registerImage})` }}
+      >
+        <div className="reg-right-overlay" />
+        <div className="reg-right-quote">
+          <span>"Every expert was once a beginner."</span>
+        </div>
+      </motion.div>
     </div>
   );
 };

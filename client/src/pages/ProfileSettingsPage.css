@@ -1,0 +1,383 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ── Root ── */
+.psp-root {
+  position: relative;
+  min-height: 100vh;
+  background: #050818;
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+.psp-grid {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(99, 102, 241, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.psp-orb {
+  position: fixed;
+  top: -100px;
+  right: -100px;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.14) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 1;
+  animation: pspOrb 9s ease-in-out infinite alternate;
+}
+
+@keyframes pspOrb {
+  from { transform: translateY(0) scale(1); }
+  to   { transform: translateY(36px) scale(1.06); }
+}
+
+/* ── Content ── */
+.psp-content {
+  position: relative;
+  z-index: 2;
+}
+
+.psp-inner {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+/* ── Page header ── */
+.psp-page-header {
+  text-align: center;
+  margin-bottom: 32px;
+  animation: pspUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes pspUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.psp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #a5b4fc;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 100px;
+  margin-bottom: 14px;
+}
+
+.psp-eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  background: #818cf8;
+  border-radius: 50%;
+  animation: pspPulse 2s ease infinite;
+}
+
+@keyframes pspPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+.psp-page-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #e0e7ff 0%, #818cf8 50%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Main card ── */
+.psp-card {
+  position: relative;
+  background: rgba(10, 12, 35, 0.85);
+  border: 1px solid rgba(99, 102, 241, 0.18);
+  border-radius: 24px;
+  padding: 36px 32px 32px;
+  backdrop-filter: blur(20px);
+  overflow: hidden;
+  animation: pspUp 0.9s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.psp-card-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #6366f1 40%, #818cf8 60%, transparent 100%);
+}
+
+/* ── Feedback message ── */
+.psp-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  padding: 11px 16px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.psp-message--success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  color: #6ee7b7;
+}
+
+.psp-message--error {
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.28);
+  color: #fca5a5;
+}
+
+.psp-message-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.psp-message--success .psp-message-dot { background: #34d399; }
+.psp-message--error .psp-message-dot   { background: #f87171; }
+
+/* ── Section ── */
+.psp-section {
+  margin-bottom: 8px;
+}
+
+.psp-section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+  margin-bottom: 18px;
+}
+
+/* ── Avatar ── */
+.psp-avatar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.psp-avatar-label {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: block;
+}
+
+.psp-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(99, 102, 241, 0.35);
+}
+
+.psp-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(6, 8, 30, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.psp-avatar-label:hover .psp-avatar-overlay {
+  opacity: 1;
+}
+
+.psp-avatar-icon {
+  color: #a5b4fc;
+  font-size: 20px;
+}
+
+.psp-avatar-hint {
+  font-size: 12px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.psp-hidden {
+  display: none;
+}
+
+/* ── Divider ── */
+.psp-divider {
+  height: 1px;
+  background: rgba(99, 102, 241, 0.12);
+  margin: 24px 0;
+}
+
+.psp-divider--mt {
+  margin-top: 32px;
+}
+
+/* ── Field grid ── */
+.psp-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.psp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.psp-field--full {
+  grid-column: 1 / -1;
+}
+
+.psp-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.psp-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: #e0e7ff;
+  outline: none;
+  transition: all 0.22s ease;
+  width: 100%;
+  box-sizing: border-box;
+  color-scheme: dark;
+}
+
+.psp-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.psp-input:focus {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.psp-field-hint {
+  font-size: 11px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.25);
+  margin-top: 2px;
+}
+
+/* ── Eye wrap ── */
+.psp-eye-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.psp-eye-wrap .psp-input {
+  padding-right: 44px;
+}
+
+.psp-eye {
+  position: absolute;
+  right: 14px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.psp-eye:hover {
+  color: #818cf8;
+}
+
+/* ── Buttons ── */
+.psp-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.psp-btn--primary {
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  color: #fff;
+  box-shadow: 0 0 28px rgba(99, 102, 241, 0.4);
+  margin-top: 8px;
+}
+
+.psp-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 44px rgba(99, 102, 241, 0.6);
+}
+
+.psp-btn--danger {
+  background: rgba(220, 38, 38, 0.12);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  color: #fca5a5;
+  margin-top: 8px;
+}
+
+.psp-btn--danger:hover {
+  background: rgba(220, 38, 38, 0.2);
+  border-color: rgba(220, 38, 38, 0.5);
+  transform: translateY(-2px);
+}
+
+.psp-btn:active {
+  transform: scale(0.98);
+}
+
+/* ── Responsive ── */
+@media (max-width: 560px) {
+  .psp-card {
+    padding: 28px 20px 24px;
+  }
+
+  .psp-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .psp-field--full {
+    grid-column: 1;
+  }
+}
