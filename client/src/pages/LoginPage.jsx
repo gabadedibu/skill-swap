@@ -53,7 +53,10 @@ const LoginPage = () => {
         email,
         password,
       });
-
+  // const response = await axios.post("http://localhost:5000/api/auth/login", {
+  //       email,
+  //       password,
+  //     });
 
       const token = response.data.token;
       const decoded = jwtDecode(token)

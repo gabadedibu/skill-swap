@@ -34,17 +34,26 @@ const server = http.createServer(app);
 //     credentials: true,
 //   },
 // });
-const io = socketIo(server, {
-  cors: {
-    origin: [
-      'http://localhost:5173',
-      'https://skill-swap-virid.vercel.app/'
-    ],
+const io     = socketIo(server, {
+ cors: {
+   origin: 'https://skill-swap-virid.vercel.app/',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'x-auth-token'],
-    credentials: true,
+  allowedHeaders: ['Content-Type, x-auth-token'],
+   credentials: true,
   },
 });
+
+// const io = socketIo(server, {
+//   cors: {
+//     origin: [
+//       'http://localhost:5173',
+//       'https://skill-swap-virid.vercel.app/'
+//     ],
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     allowedHeaders: ['Content-Type', 'x-auth-token'],
+//     credentials: true,
+//   },
+// });
 
 // ✅ Create namespaces from single instance
 const sessionSocket      = io.of('/sessions');
