@@ -4,35 +4,6 @@ import Navbar from '../components/admin/Navbar';
 import AdminSideBar from "../components/admin/AdminSideBar";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProfile } from '../redux/slices/adminProfileSlice';
-import { FiUsers, FiFlag, FiBarChart2, FiUser } from 'react-icons/fi';
-import './AdminDashboardPage.css';
-
-const statCards = [
-  {
-    title: 'Users',
-    icon: <FiUsers />,
-    text: 'View and manage all registered users. Control access, update profiles, and monitor activities.',
-    colorClass: 'adp-stat--indigo',
-  },
-  {
-    title: 'Reports',
-    icon: <FiFlag />,
-    text: 'Analyze reported issues, take action on complaints, and maintain platform integrity.',
-    colorClass: 'adp-stat--red',
-  },
-  {
-    title: 'Analytics',
-    icon: <FiBarChart2 />,
-    text: 'Monitor usage stats, trends, and system performance for better decision-making.',
-    colorClass: 'adp-stat--emerald',
-  },
-  {
-    title: 'Profile',
-    icon: <FiUser />,
-    text: 'Update your profile, change settings, and manage your administrator account.',
-    colorClass: 'adp-stat--amber',
-  },
-];
 
 const AdminDashboardPage = () => {
   const dispatch = useDispatch();
@@ -43,7 +14,9 @@ const AdminDashboardPage = () => {
     dispatch(fetchProfile());
   }, [dispatch]);
 
-  const _toggleSidebar = () => setSidebarOpen((prev) => !prev);
+  const _toggleSidebar = () => {
+    setSidebarOpen((prev) => !prev);
+  };
 
   const profileImage = user?.profilePicture
     ? user.profilePicture.startsWith('http')
@@ -52,81 +25,101 @@ const AdminDashboardPage = () => {
     : 'https://placehold.co/150x150?text=Admin';
 
   return (
-    <div className="adp-root">
-      {/* Background layers */}
-      <div className="adp-bg-base" />
-      <div className="adp-bg-grid" />
-      <div className="adp-bg-orb adp-bg-orb--tr" />
-      <div className="adp-bg-orb adp-bg-orb--bl" />
-
+    <div className="min-h-screen bg-white">
       <Navbar
         adminName={user?.name || 'Admin'}
         profileImage={profileImage}
         onToggleSidebar={_toggleSidebar}
       />
 
-      <div className="adp-layout">
-        {/* Sidebar */}
-        <div className={`adp-sidebar-wrap ${sidebarOpen ? 'adp-sidebar-wrap--open' : ''}`}>
-          {sidebarOpen && <AdminSideBar />}
-        </div>
+      <div className="flex pt-16 transition-all duration-300">
+        {sidebarOpen && <AdminSideBar />}
 
-        {/* Main content */}
-        <main className="adp-main">
+        <main
+          className={`flex-1 p-6 overflow-y-auto max-h-[calc(100vh-4rem)] transition-all duration-300 ${sidebarOpen ? 'ml-0 md:ml-0' : ''
+            }`}
+        >
+          {/* Profile Card */}
+          <div className="flex flex-col md:flex-row items-start bg-blue-900 rounded-lg shadow-md p-6 mb-6 animate-fade-in">
+  <div className="relative group flex-shrink-0">
+    <img
+      src={profileImage}
+      alt="Profile"
+      onError={(e) => {
+        e.currentTarget.onerror = null;
+        e.currentTarget.src = 'https://placehold.co/150x150?text=Admin';
+      }}
+      className="w-24 h-24 rounded-full border-4 border-white object-cover transform transition-transform duration-300 group-hover:scale-110"
+    />
+  </div>
+  <div className="md:ml-6 mt-4 md:mt-0 text-left">
+    <h2 className="text-2xl font-bold text-white">{user?.name || 'Admin User'}</h2>
+    <p className="text-white mt-2 leading-relaxed">
+      Responsible for overseeing platform operations and ensuring user compliance. <br />
+      Manages user data, handles reports, and maintains system integrity. <br />
+      Monitors analytics to drive informed decisions and improvements. <br />
+      Acts as the primary point of control for administrative tasks and updates.
+    </p>
+  </div>
+</div>
 
-          {/* Profile hero card */}
-          <div className="adp-profile-card adp-animate-in">
-            <div className="adp-card-bar" />
 
-            <div className="adp-profile-avatar-wrap">
-              <img
-                src={profileImage}
-                alt="Profile"
-                className="adp-profile-avatar"
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = 'https://placehold.co/150x150?text=Admin';
-                }}
-              />
-              <span className="adp-admin-ring" />
-            </div>
+          {/* Four Boxes */}
+          {/* Four Boxes */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                title: 'USERS',
+                text: 'View and manage all registered users. Control access, update profiles, and monitor user activities.',
+              },
+              {
+                title: 'REPORTS',
+                text: 'Analyze reported issues, take action on complaints, and maintain platform integrity.',
+              },
+              {
+                title: 'ANALYTICS',
+                text: 'Monitor usage stats, trends, and system performance for better decision-making.',
+              },
+              {
+                title: 'PROFILE',
+                text: 'Update your profile, change settings, and manage your administrator account.',
+              },
+            ].map(({ title, text }) => (
+              <div
+                key={title}
+                className="bg-blue-900 text-white rounded-lg shadow p-4 border border-white transform transition-transform duration-300 hover:scale-105"
 
-            <div className="adp-profile-info">
-              <div className="adp-profile-name-row">
-                <h2 className="adp-profile-name">{user?.name || 'Admin User'}</h2>
-                <span className="adp-admin-badge">
-                  <span className="adp-admin-badge-dot" />
-                  Administrator
-                </span>
-              </div>
-              <p className="adp-profile-desc">
-                Responsible for overseeing platform operations and ensuring user compliance.
-                Manages user data, handles reports, and maintains system integrity.
-                Monitors analytics to drive informed decisions and improvements.
-              </p>
-            </div>
-          </div>
-
-          {/* Stat cards */}
-          <div className="adp-stat-grid">
-            {statCards.map(({ title, icon, text, colorClass }) => (
-              <div key={title} className={`adp-stat-card ${colorClass}`}>
-                <div className="adp-stat-bar" />
-                <div className="adp-stat-icon-wrap">
-                  <span className="adp-stat-icon">{icon}</span>
-                </div>
-                <h3 className="adp-stat-title">{title}</h3>
-                <p className="adp-stat-text">{text}</p>
+              >
+                <h3 className="font-bold text-lg mb-2">{title}</h3>
+                <p>{text}</p>
               </div>
             ))}
           </div>
 
-          {/* Nested routes */}
-          <div className="adp-outlet">
+
+          {/* Nested Routes */}
+          <div className="mt-8">
             <Outlet />
           </div>
         </main>
       </div>
+
+      {/* Animation keyframe */}
+      <style>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out;
+        }
+      `}</style>
     </div>
   );
 };
