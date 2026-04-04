@@ -1,9 +1,9 @@
 // client/src/components/admin/Navbar.jsx
 import React from 'react';
 import { FaBars } from 'react-icons/fa';
-import './Navbar.css';
+import './AdminNavbar.css';
 
-const Navbar = ({ adminName, profileImage, onToggleSidebar }) => {
+const AdminNavbar = ({ adminName, profileImage, onToggleSidebar }) => {
   return (
     <header className="an-root">
       <div className="an-shimmer" />
@@ -44,4 +44,4 @@ const Navbar = ({ adminName, profileImage, onToggleSidebar }) => {
   );
 };
 
-export default Navbar;
+export default AdminNavbar;

@@ -1,0 +1,344 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ── Root ── */
+.adp-root {
+  position: relative;
+  min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ── Background layers ── */
+.adp-bg-base {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(160deg, #030612 0%, #060d24 40%, #050818 70%, #03050f 100%);
+  z-index: 0;
+}
+
+.adp-bg-grid {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(99, 102, 241, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.055) 1px, transparent 1px);
+  background-size: 56px 56px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.adp-bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.adp-bg-orb--tr {
+  top: -120px;
+  right: -120px;
+  width: 560px;
+  height: 560px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.14) 0%, transparent 65%);
+  animation: adpOrb 12s ease-in-out infinite alternate;
+}
+
+.adp-bg-orb--bl {
+  bottom: -100px;
+  left: -100px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 65%);
+  animation: adpOrb 16s 4s ease-in-out infinite alternate;
+}
+
+@keyframes adpOrb {
+  from { transform: translateY(0) scale(1); }
+  to   { transform: translateY(32px) scale(1.07); }
+}
+
+/* ── Layout ── */
+.adp-layout {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  padding-top: 64px; /* navbar height */
+  min-height: 100vh;
+}
+
+.adp-sidebar-wrap {
+  width: 0;
+  overflow: hidden;
+  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  flex-shrink: 0;
+}
+
+.adp-sidebar-wrap--open {
+  width: 240px;
+}
+
+/* ── Main ── */
+.adp-main {
+  flex: 1;
+  padding: 32px 28px 64px;
+  overflow-y: auto;
+  max-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Fade-in animation ── */
+.adp-animate-in {
+  animation: adpFadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes adpFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Shared card bar ── */
+.adp-card-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #6366f1 40%, #818cf8 60%, transparent);
+}
+
+/* ── Profile card ── */
+.adp-profile-card {
+  position: relative;
+  background: rgba(10, 12, 35, 0.88);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 20px;
+  padding: 28px 28px 24px;
+  backdrop-filter: blur(20px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.adp-profile-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.adp-profile-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(99, 102, 241, 0.4);
+  transition: transform 0.3s ease;
+  display: block;
+  position: relative;
+  z-index: 2;
+}
+
+.adp-profile-avatar-wrap:hover .adp-profile-avatar {
+  transform: scale(1.06);
+}
+
+/* Outer glow ring */
+.adp-admin-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  animation: adpRingPulse 3s ease infinite;
+  z-index: 1;
+}
+
+@keyframes adpRingPulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50%       { opacity: 1; transform: scale(1.04); }
+}
+
+.adp-profile-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.adp-profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.adp-profile-name {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #e0e7ff;
+  margin: 0;
+}
+
+.adp-admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(99, 102, 241, 0.14);
+  border: 1px solid rgba(99, 102, 241, 0.28);
+  color: #a5b4fc;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 11px;
+  border-radius: 100px;
+}
+
+.adp-admin-badge-dot {
+  width: 5px; height: 5px;
+  background: #818cf8;
+  border-radius: 50%;
+  animation: adpPulse 2s ease infinite;
+}
+
+@keyframes adpPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+.adp-profile-desc {
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.42);
+  line-height: 1.75;
+  margin: 0;
+}
+
+/* ── Stat cards grid ── */
+.adp-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .adp-stat-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 560px) {
+  .adp-stat-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Stat card base ── */
+.adp-stat-card {
+  position: relative;
+  background: rgba(10, 12, 35, 0.85);
+  border-radius: 16px;
+  padding: 22px 18px 20px;
+  backdrop-filter: blur(20px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+  cursor: default;
+}
+
+.adp-stat-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Shimmer bar for each card */
+.adp-stat-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+
+/* ── Color variants ── */
+
+/* Indigo — Users */
+.adp-stat--indigo {
+  border-color: rgba(99, 102, 241, 0.2);
+}
+.adp-stat--indigo:hover { border-color: rgba(99, 102, 241, 0.42); }
+.adp-stat--indigo .adp-stat-bar { background: linear-gradient(90deg, transparent, #6366f1 40%, #818cf8 60%, transparent); }
+.adp-stat--indigo .adp-stat-icon-wrap { background: rgba(99, 102, 241, 0.14); border-color: rgba(99, 102, 241, 0.28); }
+.adp-stat--indigo .adp-stat-icon { color: #a5b4fc; }
+.adp-stat--indigo .adp-stat-title { color: #c7d2fe; }
+
+/* Red — Reports */
+.adp-stat--red {
+  border-color: rgba(220, 38, 38, 0.18);
+}
+.adp-stat--red:hover { border-color: rgba(220, 38, 38, 0.4); }
+.adp-stat--red .adp-stat-bar { background: linear-gradient(90deg, transparent, #dc2626 40%, #f87171 60%, transparent); }
+.adp-stat--red .adp-stat-icon-wrap { background: rgba(220, 38, 38, 0.1); border-color: rgba(220, 38, 38, 0.24); }
+.adp-stat--red .adp-stat-icon { color: #fca5a5; }
+.adp-stat--red .adp-stat-title { color: #fecaca; }
+
+/* Emerald — Analytics */
+.adp-stat--emerald {
+  border-color: rgba(52, 211, 153, 0.18);
+}
+.adp-stat--emerald:hover { border-color: rgba(52, 211, 153, 0.4); }
+.adp-stat--emerald .adp-stat-bar { background: linear-gradient(90deg, transparent, #10b981 40%, #34d399 60%, transparent); }
+.adp-stat--emerald .adp-stat-icon-wrap { background: rgba(52, 211, 153, 0.1); border-color: rgba(52, 211, 153, 0.24); }
+.adp-stat--emerald .adp-stat-icon { color: #6ee7b7; }
+.adp-stat--emerald .adp-stat-title { color: #a7f3d0; }
+
+/* Amber — Profile */
+.adp-stat--amber {
+  border-color: rgba(251, 191, 36, 0.18);
+}
+.adp-stat--amber:hover { border-color: rgba(251, 191, 36, 0.4); }
+.adp-stat--amber .adp-stat-bar { background: linear-gradient(90deg, transparent, #d97706 40%, #fbbf24 60%, transparent); }
+.adp-stat--amber .adp-stat-icon-wrap { background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.24); }
+.adp-stat--amber .adp-stat-icon { color: #fcd34d; }
+.adp-stat--amber .adp-stat-title { color: #fde68a; }
+
+/* Shared icon wrap */
+.adp-stat-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.adp-stat-icon {
+  font-size: 18px;
+}
+
+.adp-stat-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.adp-stat-text {
+  font-size: 12px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── Outlet ── */
+.adp-outlet {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .adp-main { padding: 20px 16px 48px; }
+  .adp-profile-card { flex-direction: column; align-items: flex-start; }
+}

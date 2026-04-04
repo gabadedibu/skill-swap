@@ -7,8 +7,9 @@ const sessionSchema = new mongoose.Schema(
     userId2: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     sessionDate: { type: Date, required: true },
     sessionTime: { type: String, required: true },
-    newMeetingDate: { type: Date, required: false },  // New field to store the scheduled time
-    newMeetingTime: { type: String, required: false },  // New field to store the scheduled time
+    newMeetingDate: { type: Date, required: false },
+    newMeetingTime: { type: String, required: false },
+    zoomLink: { type: String, required: false, default: '' }, // ✅ new field
     status: { type: String, default: 'pending' },
     ratingByUser1: { type: Number, min: 1, max: 5, default: null },
     feedbackByUser1: { type: String, default: '' },
@@ -17,7 +18,7 @@ const sessionSchema = new mongoose.Schema(
     sessionClosed: { type: Boolean, default: false },
     feedbackGivenByUser1: { type: Boolean, default: false },
     feedbackGivenByUser2: { type: Boolean, default: false },
-    skill: { type: String, required: true },  // Added skill field
+    skill: { type: String, required: true },
   },
   { timestamps: true }
 );

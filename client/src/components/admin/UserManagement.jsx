@@ -6,25 +6,21 @@ import {
   deleteUser,
   unblockUser
 } from '../../redux/slices/adminSlice';
+import { FiUserPlus, FiTrash2, FiUnlock } from 'react-icons/fi';
+import './UserManagement.css';
 
 const UserManagement = () => {
   const dispatch = useDispatch();
   const { users, loading, error } = useSelector(state => state.admin);
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: 'user'
+    name: '', email: '', password: '', role: 'user'
   });
 
-  useEffect(() => {
-    dispatch(fetchUsers());
-  }, [dispatch]);
+  useEffect(() => { dispatch(fetchUsers()); }, [dispatch]);
 
-  const handleChange = e => {
+  const handleChange = e =>
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
 
   const handleAdd = e => {
     e.preventDefault();
@@ -44,46 +40,36 @@ const UserManagement = () => {
     dispatch(unblockUser(id)).then(() => dispatch(fetchUsers()));
   };
 
-  // Memoize derived rows to avoid re-render on unrelated state changes
-  const userRows = useMemo(
-    () => users.map(u => {
+  const userRows = useMemo(() =>
+    users.map(u => {
       const isBlocked = u.status === 'blocked';
       return (
-        <tr key={u._id} className="bg-white border-t border-blue-700">
-          <td className="p-3 text-center border-r border-blue-700 text-blue-900">
-            {u.name}
+        <tr key={u._id} className="um-row">
+          <td className="um-td">
+            <div className="um-name-cell">
+              <div className="um-initial">{u.name.charAt(0).toUpperCase()}</div>
+              {u.name}
+            </div>
           </td>
-          <td className="p-3 text-center border-r border-blue-700 text-blue-900">
-            {u.email}
+          <td className="um-td um-email">{u.email}</td>
+          <td className="um-td">
+            <span className={`um-role-badge ${u.role === 'admin' ? 'um-role-badge--admin' : ''}`}>
+              {u.role}
+            </span>
           </td>
-          <td className="p-3 text-center border-r border-blue-700 text-blue-900 capitalize">
-            {u.role}
-          </td>
-          <td className="p-3 text-center border-r border-blue-700">
-            <span
-              className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
-                isBlocked
-                  ? 'bg-red-600 text-white'
-                  : 'bg-green-600 text-white'
-              }`}
-            >
+          <td className="um-td">
+            <span className={`um-status-badge ${isBlocked ? 'um-status-badge--blocked' : 'um-status-badge--active'}`}>
               {isBlocked ? 'Blocked' : 'Active'}
             </span>
           </td>
-          <td className="p-3 text-center text-blue-900">
+          <td className="um-td um-td-actions">
             {isBlocked ? (
-              <button
-                onClick={() => handleUnblock(u._id)}
-                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm font-semibold shadow"
-              >
-                Unblock
+              <button onClick={() => handleUnblock(u._id)} className="um-btn um-btn--unblock">
+                <FiUnlock size={12} /> Unblock
               </button>
             ) : (
-              <button
-                onClick={() => handleDelete(u._id)}
-                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-semibold shadow"
-              >
-                Delete
+              <button onClick={() => handleDelete(u._id)} className="um-btn um-btn--delete">
+                <FiTrash2 size={12} /> Delete
               </button>
             )}
           </td>
@@ -94,82 +80,108 @@ const UserManagement = () => {
   );
 
   return (
-    <div className="p-6 space-y-6">
-      <h2 className="text-3xl font-bold mb-6 text-blue-700 text-left">
-        User Management
-      </h2>
+    <div className="um-root">
+      {/* Page header */}
+      <div className="um-header">
+        <span className="um-eyebrow"><span className="um-eyebrow-dot" />Users</span>
+        <h2 className="um-title">User Management</h2>
+        <p className="um-subtitle">Add, manage, and moderate platform users.</p>
+      </div>
 
-      {/* Add New User Form */}
-      <div className="mb-10 p-6 border-2 border-blue-700 rounded-lg bg-white shadow-lg">
-        <h3 className="text-xl font-bold mb-4 text-blue-700">Add New User</h3>
-        <form onSubmit={handleAdd}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <input
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Name"
-              className="border border-blue-400 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-600"
-              required
-            />
-            <input
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Email"
-              className="border border-blue-400 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-600"
-              required
-            />
-            <input
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Password"
-              className="border border-blue-400 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-600"
-              required
-            />
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="border border-blue-400 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-600"
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
+      {/* Add user form */}
+      <div className="um-form-card">
+        <div className="um-card-bar" />
+        <div className="um-form-header">
+          <FiUserPlus size={16} className="um-form-icon" />
+          <h3 className="um-form-title">Add New User</h3>
+        </div>
+
+        <form onSubmit={handleAdd} className="um-form">
+          <div className="um-form-grid">
+            <div className="um-field">
+              <label className="um-label">Name</label>
+              <input
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Full name"
+                className="um-input"
+                required
+              />
+            </div>
+            <div className="um-field">
+              <label className="um-label">Email</label>
+              <input
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Email address"
+                className="um-input"
+                required
+              />
+            </div>
+            <div className="um-field">
+              <label className="um-label">Password</label>
+              <input
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Password"
+                className="um-input"
+                required
+              />
+            </div>
+            <div className="um-field">
+              <label className="um-label">Role</label>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="um-input um-select"
+              >
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
           </div>
-          <button
-            type="submit"
-            className="mt-6 bg-blue-700 hover:bg-blue-800 transition-colors text-white font-semibold px-5 py-2 rounded shadow-md"
-          >
+
+          <button type="submit" className="um-submit-btn">
+            <FiUserPlus size={14} />
             Add User
           </button>
         </form>
       </div>
 
-      {/* Users Table */}
-      <div className="border-2 border-blue-700 rounded-lg bg-white shadow-lg overflow-hidden">
+      {/* Users table */}
+      <div className="um-table-card">
+        <div className="um-card-bar" />
+
         {loading ? (
-          <p className="text-blue-700 p-4">Loading users...</p>
+          <div className="um-state">
+            <div className="um-spinner" />
+            <span>Loading users…</span>
+          </div>
         ) : error ? (
-          <p className="text-red-300 p-4">{error}</p>
+          <div className="um-error-banner">
+            <span className="um-error-dot" />{error}
+          </div>
         ) : (
-          <table className="w-full">
-            <thead className="bg-blue-900 text-white font-bold">
-              <tr>
-                <th className="p-3 text-center border-r border-blue-700">Name</th>
-                <th className="p-3 text-center border-r border-blue-700">Email</th>
-                <th className="p-3 text-center border-r border-blue-700">Role</th>
-                <th className="p-3 text-center border-r border-blue-700">Status</th>
-                <th className="p-3 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {userRows}
-            </tbody>
-          </table>
+          <div className="um-table-wrap">
+            <table className="um-table">
+              <thead>
+                <tr className="um-thead-row">
+                  <th className="um-th">Name</th>
+                  <th className="um-th">Email</th>
+                  <th className="um-th">Role</th>
+                  <th className="um-th">Status</th>
+                  <th className="um-th">Actions</th>
+                </tr>
+              </thead>
+              <tbody>{userRows}</tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

@@ -3,10 +3,42 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAnalytics } from '../../redux/slices/adminSlice';
 import { motion } from 'framer-motion';
+import { FaUsers, FaCalendarCheck, FaFlag } from 'react-icons/fa';
+import './AnalyticsOverview.css';
 
-import usersImg from '../../assets/users.jpg';
-import sessionsImg from '../../assets/sessions.jpg';
-import reportsImg from '../../assets/reports.jpg';
+const cards = [
+  {
+    key: 'userCount',
+    label: 'Total Users',
+    icon: <FaUsers />,
+    colorClass: 'ao-card--indigo',
+  },
+  {
+    key: 'sessionCount',
+    label: 'Total Sessions',
+    icon: <FaCalendarCheck />,
+    colorClass: 'ao-card--emerald',
+  },
+  {
+    key: 'reportCount',
+    label: 'Total Reports',
+    icon: <FaFlag />,
+    colorClass: 'ao-card--red',
+  },
+];
+
+const containerVariant = {
+  hidden: { opacity: 0, x: -40 },
+  visible: {
+    opacity: 1, x: 0,
+    transition: { duration: 0.6, ease: 'easeOut', when: 'beforeChildren', staggerChildren: 0.15 },
+  },
+};
+
+const cardVariant = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+};
 
 const AnalyticsOverview = () => {
   const dispatch = useDispatch();
@@ -16,81 +48,54 @@ const AnalyticsOverview = () => {
     dispatch(fetchAnalytics());
   }, [dispatch]);
 
-  const containerVariant = {
-    hidden: { opacity: 0, x: -100 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: {
-        duration: 0.6,
-        ease: 'easeOut',
-        when: 'beforeChildren',
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const cardVariant = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0 },
-  };
-
   return (
     <motion.div
+      className="ao-root"
       variants={containerVariant}
       initial="hidden"
       animate="visible"
-      className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-6"
     >
-      <h2 className="text-3xl font-bold mb-10 text-blue-700">Analytics Overview</h2>
+      {/* Header */}
+      <div className="ao-header">
+        <span className="ao-eyebrow"><span className="ao-eyebrow-dot" />Admin Analytics</span>
+        <h2 className="ao-title">Analytics Overview</h2>
+        <p className="ao-subtitle">Real-time platform metrics at a glance.</p>
+      </div>
 
       {loading ? (
-        <p>Loading analytics...</p>
+        <div className="ao-loading">
+          <div className="ao-spinner" />
+          <span>Loading analytics…</span>
+        </div>
       ) : error ? (
-        <p className="text-red-500">{error}</p>
+        <div className="ao-error">
+          <span className="ao-error-dot" />
+          {error}
+        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
-          {/* USERS CARD */}
-          <motion.div
-            variants={cardVariant}
-            className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center space-y-4"
-          >
-            <img
-              src={usersImg}
-              alt="Users"
-              className="w-24 h-24 object-cover rounded-full border-2 border-blue-500"
-            />
-            <p className="text-4xl font-semibold text-blue-800">{analytics.userCount}</p>
-            <p className="text-lg text-gray-600">Total Users</p>
-          </motion.div>
+        <div className="ao-grid">
+          {cards.map(({ key, label, icon, colorClass }) => (
+            <motion.div
+              key={key}
+              variants={cardVariant}
+              className={`ao-card ${colorClass}`}
+              whileHover={{ y: -4 }}
+            >
+              <div className="ao-card-bar" />
 
-          {/* SESSIONS CARD */}
-          <motion.div
-            variants={cardVariant}
-            className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center space-y-4"
-          >
-            <img
-              src={sessionsImg}
-              alt="Sessions"
-              className="w-24 h-24 object-cover rounded-full border-2 border-green-500"
-            />
-            <p className="text-4xl font-semibold text-green-800">{analytics.sessionCount}</p>
-            <p className="text-lg text-gray-600">Total Sessions</p>
-          </motion.div>
+              <div className="ao-card-icon-wrap">
+                <span className="ao-card-icon">{icon}</span>
+              </div>
 
-          {/* REPORTS CARD */}
-          <motion.div
-            variants={cardVariant}
-            className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center space-y-4"
-          >
-            <img
-              src={reportsImg}
-              alt="Reports"
-              className="w-24 h-24 object-cover rounded-full border-2 border-red-500"
-            />
-            <p className="text-4xl font-semibold text-red-800">{analytics.reportCount}</p>
-            <p className="text-lg text-gray-600">Total Reports</p>
-          </motion.div>
+              <div className="ao-card-body">
+                <span className="ao-card-num">{analytics?.[key] ?? '—'}</span>
+                <span className="ao-card-label">{label}</span>
+              </div>
+
+              {/* Subtle glow blob */}
+              <div className="ao-card-glow" />
+            </motion.div>
+          ))}
         </div>
       )}
     </motion.div>

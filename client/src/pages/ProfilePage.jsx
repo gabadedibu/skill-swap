@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/navbar/Navbar";
 import NotificationBell from "../components/NotificationBell";
-import ProfileCard from "../components/ProfileCard";
 import { FaLinkedin, FaFacebook, FaInstagram } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { FiEdit, FiCalendar, FiClock, FiMessageSquare, FiCheck } from "react-icons/fi";
@@ -31,7 +30,7 @@ const ProfilePage = () => {
   const [acceptedSessions, setAcceptedSessions] = useState([]);
   const [completedSessions, setCompletedSessions] = useState([]);
   const [canceledSessions, setCanceledSessions] = useState([]);
-  const [activeTab, setActiveTab] = useState("pending");
+  const [activeTab, setActiveTab] = useState("upcoming");  // ✅ default to upcoming since sessions auto-accept
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -73,8 +72,9 @@ const ProfilePage = () => {
           axios.get("https://skill-swap-9y9h.onrender.com/api/sessions/completed", { headers: { "x-auth-token": token } }),
           axios.get("https://skill-swap-9y9h.onrender.com/api/sessions/canceled", { headers: { "x-auth-token": token } }),
         ]);
-        const now = new Date();
-        setPendingSessions(p.data.filter((s) => new Date(s.sessionDate) >= now));
+
+        // ✅ FIX: No date filter — show ALL sessions regardless of date
+        setPendingSessions(p.data);
         setAcceptedSessions(a.data);
         setCompletedSessions(co.data);
         setCanceledSessions(c.data);
@@ -123,6 +123,7 @@ const ProfilePage = () => {
     }
   };
 
+  // ✅ Keep accept handler for any old pending sessions in DB
   const handleAccept = async (id) => {
     const token = localStorage.getItem("token");
     try {
@@ -182,11 +183,10 @@ const ProfilePage = () => {
         <Navbar />
 
         <div className="pp-inner">
-          {/* ── Hero profile card ── */}
+          {/* Hero profile card */}
           <div className="pp-hero-card">
             <div className="pp-card-bar" />
 
-            {/* Controls */}
             <div className="pp-hero-controls">
               <NotificationBell />
               <button onClick={() => navigate("/profile-settings")} className="pp-edit-btn" title="Edit Profile">
@@ -194,7 +194,6 @@ const ProfilePage = () => {
               </button>
             </div>
 
-            {/* Avatar + Info */}
             <div className="pp-hero-left">
               <div className="pp-avatar-ring">
                 <img
@@ -208,32 +207,23 @@ const ProfilePage = () => {
               <div className="pp-hero-info">
                 <h2 className="pp-hero-name">{user?.name || "User"}</h2>
                 <p className="pp-hero-welcome">Welcome to your profile!</p>
-                {user?.status && (
-                  <span className="pp-status-badge">{user.status}</span>
-                )}
+                {user?.status && <span className="pp-status-badge">{user.status}</span>}
                 {user?.socials && (
                   <div className="pp-socials">
                     {user.socials.linkedin && (
-                      <a href={user.socials.linkedin} target="_blank" rel="noreferrer" className="pp-social-link">
-                        <FaLinkedin />
-                      </a>
+                      <a href={user.socials.linkedin} target="_blank" rel="noreferrer" className="pp-social-link"><FaLinkedin /></a>
                     )}
                     {user.socials.facebook && (
-                      <a href={user.socials.facebook} target="_blank" rel="noreferrer" className="pp-social-link">
-                        <FaFacebook />
-                      </a>
+                      <a href={user.socials.facebook} target="_blank" rel="noreferrer" className="pp-social-link"><FaFacebook /></a>
                     )}
                     {user.socials.twitter && (
-                      <a href={user.socials.twitter} target="_blank" rel="noreferrer" className="pp-social-link">
-                        <FaInstagram />
-                      </a>
+                      <a href={user.socials.twitter} target="_blank" rel="noreferrer" className="pp-social-link"><FaInstagram /></a>
                     )}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Progress rings */}
             <div className="pp-progress-row">
               {progressStats.map(({ label, count, color }) => (
                 <div key={label} className="pp-progress-item">
@@ -253,11 +243,9 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* Feedback */}
           {success && <div className="pp-feedback pp-feedback--success"><span className="pp-feedback-dot" />{success}</div>}
           {error   && <div className="pp-feedback pp-feedback--error"><span className="pp-feedback-dot" />{error}</div>}
 
-          {/* ── Two-column section ── */}
           <div className="pp-two-col">
             {/* Skills card */}
             <div className="pp-card">
@@ -266,7 +254,6 @@ const ProfilePage = () => {
                 <span className="pp-card-title">Your Skills</span>
                 <button onClick={openModal} className="pp-icon-btn"><FiEdit size={15} /></button>
               </div>
-
               <div className="pp-skills-section">
                 <p className="pp-skills-label">Can Teach</p>
                 <div className="pp-tags">
@@ -277,7 +264,6 @@ const ProfilePage = () => {
                     : <span className="pp-tag-empty">None added yet</span>}
                 </div>
               </div>
-
               <div className="pp-skills-section">
                 <p className="pp-skills-label">Want to Learn</p>
                 <div className="pp-tags">
@@ -297,7 +283,6 @@ const ProfilePage = () => {
                 <span className="pp-card-title">Your Sessions</span>
               </div>
 
-              {/* Tabs */}
               <div className="pp-tabs">
                 {tabs.map((tab) => (
                   <button
@@ -306,18 +291,21 @@ const ProfilePage = () => {
                     className={`pp-tab ${activeTab === tab ? "pp-tab--active" : ""}`}
                   >
                     {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                    {/* ✅ Show count badge */}
+                    {sessionMap[tab].length > 0 && (
+                      <span className="pp-tab-count">{sessionMap[tab].length}</span>
+                    )}
                   </button>
                 ))}
               </div>
 
-              {/* Session list */}
               <div className="pp-session-list">
                 {sessionMap[activeTab].length > 0 ? (
                   sessionMap[activeTab].map((s) => (
                     <div key={s._id} className="pp-session-item">
                       <div className="pp-session-top">
                         <div className="pp-session-initials">
-                          {(s.userId1?.name || "U").split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
+                          {(getSessionPartnerName(s) || "U").split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
                         </div>
                         <div className="pp-session-info">
                           <span className="pp-session-name">{getSessionPartnerName(s)}</span>
@@ -332,14 +320,17 @@ const ProfilePage = () => {
                         onClick={() => activeTab === "pending" ? handleAccept(s._id) : handleStartChat(s._id)}
                         className={`pp-session-btn ${activeTab === "pending" ? "pp-session-btn--accept" : "pp-session-btn--chat"}`}
                       >
-                        {activeTab === "pending" ? <><FiCheck size={12} /> Accept</> :
-                         activeTab === "upcoming" ? <><FiMessageSquare size={12} /> Start Chat</> : "View Feedback"}
+                        {activeTab === "pending"
+                          ? <><FiCheck size={12} /> Accept</>
+                          : activeTab === "upcoming"
+                            ? <><FiMessageSquare size={12} /> Start Chat</>
+                            : "View Chat"}
                       </button>
                     </div>
                   ))
                 ) : (
                   <div className="pp-session-empty">
-                    No {activeTab} sessions.
+                    No {activeTab} sessions yet.
                   </div>
                 )}
               </div>
@@ -347,7 +338,7 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* ── Edit Skills Modal ── */}
+        {/* Edit Skills Modal */}
         <AnimatePresence>
           {isModalOpen && (
             <motion.div

@@ -2,8 +2,8 @@ import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchEngagementStats } from '../../redux/slices/adminSlice';
 import { FaFacebookF, FaTwitter, FaLinkedinIn } from 'react-icons/fa';
+import './EngagementAnalytics.css';
 
-// Helper to turn zero-based index into ordinal label
 const getOrdinal = (i) => {
   const n = i + 1;
   if (n === 1) return '1st';
@@ -12,138 +12,115 @@ const getOrdinal = (i) => {
   return `${n}th`;
 };
 
+const rankColor = (rank) => {
+  if (rank === 0) return 'ea-rank--gold';
+  if (rank === 1) return 'ea-rank--silver';
+  if (rank === 2) return 'ea-rank--bronze';
+  return 'ea-rank--default';
+};
+
 const UserCard = React.memo(({ user, rank }) => {
   const {
-    name,
-    email,
-    skillsToTeach,
-    skillsToLearn,
-    role,
-    profilePicture,
-    socials,
-    status,
-    sessionCount,
+    name, email, skillsToTeach, skillsToLearn,
+    role, profilePicture, socials, status, sessionCount,
   } = user;
 
   const defaultAvatar = '/default-avatar.png';
 
-  // Memoize computed values for performance
-  const ordinal = useMemo(() => getOrdinal(rank), [rank]);
-  const pictureUrl = useMemo(
-    () =>
-      profilePicture
-        ? `https://skill-swap-9y9h.onrender.com/uploads/profile-pictures/${profilePicture}`
-        : defaultAvatar,
+  const ordinal    = useMemo(() => getOrdinal(rank), [rank]);
+  const pictureUrl = useMemo(() =>
+    profilePicture
+      ? `https://skill-swap-9y9h.onrender.com/uploads/profile-pictures/${profilePicture}`
+      : defaultAvatar,
     [profilePicture]
   );
-  const teachSkills = useMemo(
-    () => skillsToTeach.map((skill, i) => (
-      <span key={i} className="text-xs bg-blue-100 text-blue-900 px-2 py-1 rounded-full">
-        {skill}
-      </span>
-    )),
+  const teachSkills = useMemo(() =>
+    skillsToTeach.map((s, i) => <span key={i} className="ea-tag ea-tag--teach">{s}</span>),
     [skillsToTeach]
   );
-  const learnSkills = useMemo(
-    () => skillsToLearn.map((skill, i) => (
-      <span key={i} className="text-xs bg-blue-100 text-blue-900 px-2 py-1 rounded-full">
-        {skill}
-      </span>
-    )),
+  const learnSkills = useMemo(() =>
+    skillsToLearn.map((s, i) => <span key={i} className="ea-tag ea-tag--learn">{s}</span>),
     [skillsToLearn]
   );
 
   return (
-    <div className="relative bg-white border border-blue-900 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-200 mb-6">
-      {/* Golden Ribbon */}
-      <div className="absolute top-0 left-0">
-        <span className="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold px-3 py-1 rounded-br-lg">
-          #{ordinal}
-        </span>
-      </div>
+    <div className="ea-card">
+      <div className="ea-card-bar" />
+
+      {/* Rank ribbon */}
+      <div className={`ea-rank ${rankColor(rank)}`}>#{ordinal}</div>
 
       {/* Header */}
-      <div className="flex items-center px-6 py-4 bg-blue-900 text-white">
+      <div className="ea-card-header">
         <img
-          className="h-14 w-14 rounded-full object-cover border-2 border-white"
+          className="ea-avatar"
           src={pictureUrl}
           alt={`${name}'s avatar`}
           onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = defaultAvatar; }}
         />
-        <div className="ml-4">
-          <h3 className="text-xl font-semibold">{name}</h3>
-          <p className="text-sm opacity-90">{email}</p>
+        <div className="ea-card-user">
+          <h3 className="ea-card-name">{name}</h3>
+          <p className="ea-card-email">{email}</p>
         </div>
-        <span className="ml-auto bg-white text-blue-900 text-sm font-medium px-3 py-1 rounded">
+        <span className="ea-session-badge">
           {sessionCount} session{sessionCount !== 1 && 's'}
         </span>
       </div>
 
       {/* Body */}
-      <div className="px-6 py-4 space-y-4 text-left">
-        <div className="flex flex-wrap gap-8 text-blue-900 justify-start">
-          <div>
-            <h4 className="font-medium">Role</h4>
-            <p className="mt-1">{role}</p>
+      <div className="ea-card-body">
+        {/* Role + Status */}
+        <div className="ea-meta-row">
+          <div className="ea-meta-item">
+            <span className="ea-meta-label">Role</span>
+            <span className="ea-meta-value">{role}</span>
           </div>
-          <div>
-            <h4 className="font-medium">Status</h4>
-            <p className="mt-1">{status || '—'}</p>
-          </div>
-        </div>
-
-        <div>
-          <h4 className="font-medium text-blue-900">Skills To Teach</h4>
-          <div className="flex flex-wrap gap-2 mt-1 justify-start">
-            {skillsToTeach.length ? teachSkills : <span className="text-xs text-gray-500">None</span>}
+          <div className="ea-meta-item">
+            <span className="ea-meta-label">Status</span>
+            <span className="ea-meta-value">{status || '—'}</span>
           </div>
         </div>
 
-        <div>
-          <h4 className="font-medium text-blue-900">Skills To Learn</h4>
-          <div className="flex flex-wrap gap-2 mt-1 justify-start">
-            {skillsToLearn.length ? learnSkills : <span className="text-xs text-gray-500">None</span>}
+        {/* Skills to Teach */}
+        <div className="ea-skills-section">
+          <span className="ea-skills-label">Skills to Teach</span>
+          <div className="ea-tags">
+            {skillsToTeach.length ? teachSkills : <span className="ea-tag-empty">None</span>}
           </div>
         </div>
 
-        <div>
-          <h4 className="font-medium text-blue-900">Socials</h4>
-          <div className="flex space-x-4 mt-1">
+        {/* Skills to Learn */}
+        <div className="ea-skills-section">
+          <span className="ea-skills-label">Skills to Learn</span>
+          <div className="ea-tags">
+            {skillsToLearn.length ? learnSkills : <span className="ea-tag-empty">None</span>}
+          </div>
+        </div>
+
+        {/* Socials */}
+        <div className="ea-socials-section">
+          <span className="ea-skills-label">Socials</span>
+          <div className="ea-socials">
             {socials.facebook && (
-              <a
-                href={socials.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook profile"
-                className="text-blue-700 hover:text-blue-900 transition-colors"
-              >
-                <FaFacebookF size={20} />
+              <a href={socials.facebook} target="_blank" rel="noopener noreferrer"
+                aria-label="Facebook" className="ea-social-link">
+                <FaFacebookF />
               </a>
             )}
             {socials.twitter && (
-              <a
-                href={socials.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Twitter profile"
-                className="text-blue-700 hover:text-blue-900 transition-colors"
-              >
-                <FaTwitter size={20} />
+              <a href={socials.twitter} target="_blank" rel="noopener noreferrer"
+                aria-label="Twitter" className="ea-social-link">
+                <FaTwitter />
               </a>
             )}
             {socials.linkedin && (
-              <a
-                href={socials.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn profile"
-                className="text-blue-700 hover:text-blue-900 transition-colors"
-              >
-                <FaLinkedinIn size={20} />
+              <a href={socials.linkedin} target="_blank" rel="noopener noreferrer"
+                aria-label="LinkedIn" className="ea-social-link">
+                <FaLinkedinIn />
               </a>
             )}
             {!socials.facebook && !socials.twitter && !socials.linkedin && (
-              <span className="text-gray-500 text-sm">No links</span>
+              <span className="ea-tag-empty">No links</span>
             )}
           </div>
         </div>
@@ -160,20 +137,42 @@ const EngagementAnalytics = () => {
     dispatch(fetchEngagementStats());
   }, [dispatch]);
 
-  const users = useMemo(() => engagementStats.mostActiveUsers || [], [engagementStats]);
-  const userCards = useMemo(
-    () => users.map((user, idx) => <UserCard key={user.userId} user={user} rank={idx} />),
+  const users     = useMemo(() => engagementStats.mostActiveUsers || [], [engagementStats]);
+  const userCards = useMemo(() =>
+    users.map((user, idx) => <UserCard key={user.userId} user={user} rank={idx} />),
     [users]
   );
 
-  if (loading) return <p className="text-gray-600 p-6">Loading...</p>;
-  if (error) return <p className="text-red-600 p-6">Error: {error}</p>;
+  if (loading) return (
+    <div className="ea-state">
+      <div className="ea-spinner" />
+      <span>Loading engagement stats…</span>
+    </div>
+  );
+
+  if (error) return (
+    <div className="ea-state">
+      <div className="ea-error-msg">
+        <span className="ea-error-dot" />
+        Error: {error}
+      </div>
+    </div>
+  );
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-blue-900 mb-6">Most Active Users</h1>
-      <div>
-        {users.length ? userCards : <p className="text-gray-500">No active user data available.</p>}
+    <div className="ea-root">
+      {/* Header */}
+      <div className="ea-header">
+        <span className="ea-eyebrow"><span className="ea-eyebrow-dot" />Engagement</span>
+        <h1 className="ea-title">Most Active Users</h1>
+        <p className="ea-subtitle">Ranked by session count across the platform.</p>
+      </div>
+
+      {/* Cards */}
+      <div className="ea-list">
+        {users.length
+          ? userCards
+          : <p className="ea-empty">No active user data available.</p>}
       </div>
     </div>
   );

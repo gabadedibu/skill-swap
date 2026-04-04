@@ -7,26 +7,20 @@ import {
   blockUser
 } from '../../redux/slices/adminSlice';
 import { FaComments } from 'react-icons/fa';
+import { FiCheck, FiSlash, FiX } from 'react-icons/fi';
+import './ReportManagement.css';
 
 const ReportManagement = () => {
   const dispatch = useDispatch();
   const storeReports = useSelector(state => state.admin.reports);
   const { loading, error, sessionChats, loadingChats, errorChats } = useSelector(state => state.admin);
 
-  // Local copy so we can drop resolved ones immediately
   const [reports, setReports] = useState([]);
   const [blockedUserName, setBlockedUserName] = useState('');
   const [activeSession, setActiveSession] = useState('');
 
-  // Fetch once
-  useEffect(() => {
-    dispatch(fetchReports());
-  }, [dispatch]);
-
-  // Keep local in sync with store on initial load
-  useEffect(() => {
-    setReports(storeReports);
-  }, [storeReports]);
+  useEffect(() => { dispatch(fetchReports()); }, [dispatch]);
+  useEffect(() => { setReports(storeReports); }, [storeReports]);
 
   const handleResolve = id => {
     dispatch(resolveReport(id)).then(() => {
@@ -35,10 +29,7 @@ const ReportManagement = () => {
   };
 
   const handleBlock = (userId, userName) => {
-    dispatch(blockUser(userId)).then(() => {
-      setBlockedUserName(userName);
-      // optionally remove related reports as well...
-    });
+    dispatch(blockUser(userId)).then(() => setBlockedUserName(userName));
   };
 
   const viewChats = sessionId => {
@@ -47,143 +38,173 @@ const ReportManagement = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="rm-root">
+      {/* Page header */}
+      <div className="rm-header">
+        <span className="rm-eyebrow"><span className="rm-eyebrow-dot" />Reports</span>
+        <h2 className="rm-title">Report Management</h2>
+        <p className="rm-subtitle">Review, resolve, and act on user-submitted reports.</p>
+      </div>
+
+      {/* Blocked banner */}
       {blockedUserName && (
-        <div className="flex justify-between items-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <span>
-            User <strong>{blockedUserName}</strong> has been blocked.
-          </span>
-          <button
-            onClick={() => setBlockedUserName('')}
-            className="text-red-700 font-bold hover:text-red-900"
-          >×</button>
+        <div className="rm-banner rm-banner--block">
+          <span className="rm-banner-dot" />
+          <span>User <strong>{blockedUserName}</strong> has been blocked.</span>
+          <button className="rm-banner-close" onClick={() => setBlockedUserName('')}>
+            <FiX size={14} />
+          </button>
         </div>
       )}
 
-      <h2 className="text-3xl font-bold mb-4 text-blue-900 text-left">
-        Report Management
-      </h2>
+      {/* States */}
+      {loading && (
+        <div className="rm-state">
+          <div className="rm-spinner" />
+          <span>Loading reports…</span>
+        </div>
+      )}
+      {error && (
+        <div className="rm-banner rm-banner--error">
+          <span className="rm-banner-dot" />{error}
+        </div>
+      )}
 
-      {loading && <p className="text-gray-600 animate-pulse">Loading reports...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-
-      <div className="space-y-6">
+      {/* Report cards */}
+      <div className="rm-list">
         {reports.map(r => (
-          <div
-            key={r._id}
-            className="p-6 bg-blue-900 text-white rounded-lg shadow-lg transform transition hover:scale-105 hover:shadow-2xl"
-          >
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:justify-between mb-4">
-              <div className="space-y-1 text-left">
-                {/* Reporter */}
+          <div key={r._id} className="rm-card">
+            <div className="rm-card-bar" />
+
+            {/* Card header */}
+            <div className="rm-card-header">
+              <div className="rm-card-meta">
                 {r.reporter && (
-                  <p>
-                    <span className="font-bold">Reporter:</span> {r.reporter.name} ({r.reporter.email})
-                  </p>
+                  <div className="rm-meta-row">
+                    <span className="rm-meta-label">Reporter</span>
+                    <span className="rm-meta-value">{r.reporter.name}
+                      <span className="rm-meta-email"> · {r.reporter.email}</span>
+                    </span>
+                  </div>
                 )}
-                {/* Target User */}
                 {r.targetUser && (
-                  <p>
-                    <span className="font-bold">Target User:</span> {r.targetUser.name} ({r.targetUser.email})
-                  </p>
+                  <div className="rm-meta-row">
+                    <span className="rm-meta-label">Target User</span>
+                    <span className="rm-meta-value rm-meta-value--danger">{r.targetUser.name}
+                      <span className="rm-meta-email"> · {r.targetUser.email}</span>
+                    </span>
+                  </div>
                 )}
-                {/* Session */}
                 {r.session && (
-                  <p>
-                    <span className="font-bold">Session ID:</span> {r.session._id}
-                  </p>
+                  <div className="rm-meta-row">
+                    <span className="rm-meta-label">Session ID</span>
+                    <span className="rm-meta-mono">{r.session._id}</span>
+                  </div>
                 )}
               </div>
-              <button
-                onClick={() => viewChats(r.session._id)}
-                className="mt-4 md:mt-0 inline-flex items-center gap-2 bg-white text-blue-900 px-4 py-2 rounded-lg font-semibold transition hover:scale-105"
-              >
-                <FaComments /> View Chats
+
+              <button onClick={() => viewChats(r.session._id)} className="rm-chat-btn">
+                <FaComments size={13} />
+                View Chats
               </button>
             </div>
 
-            {/* Body */}
-            <div className="space-y-3 text-left">
-              <p>
-                <span className="font-bold">Description:</span> {r.description}
-              </p>
+            <div className="rm-divider" />
+
+            {/* Card body */}
+            <div className="rm-card-body">
+              <div className="rm-field">
+                <span className="rm-field-label">Reason</span>
+                <span className="rm-field-value rm-reason-badge">{r.reason}</span>
+              </div>
+
+              <div className="rm-field">
+                <span className="rm-field-label">Description</span>
+                <p className="rm-description">{r.description}</p>
+              </div>
+
               {r.screenshot && (
-                <div>
-                  <span className="font-bold">Screenshot:</span>
+                <div className="rm-field">
+                  <span className="rm-field-label">Screenshot</span>
                   <a
                     href={`https://skill-swap-9y9h.onrender.com${r.screenshot}`}
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="rm-screenshot-link"
                   >
                     <img
                       src={`https://skill-swap-9y9h.onrender.com${r.screenshot}`}
                       alt="Report screenshot"
-                      className="mt-2 w-32 h-32 object-cover rounded border-2 border-white shadow"
+                      className="rm-screenshot"
                     />
+                    <span className="rm-screenshot-overlay">View full</span>
                   </a>
                 </div>
               )}
-              <p>
-                <span className="font-bold">Reason:</span> {r.reason}
-              </p>
             </div>
 
             {/* Actions */}
-            <div className="mt-4 flex space-x-4">
-              <button
-                onClick={() => handleResolve(r._id)}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition hover:scale-105"
-              >
-                Resolve
+            <div className="rm-actions">
+              <button onClick={() => handleResolve(r._id)} className="rm-btn rm-btn--resolve">
+                <FiCheck size={13} /> Resolve
               </button>
               {r.targetUser && (
                 <button
                   onClick={() => handleBlock(r.targetUser._id, r.targetUser.name)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition hover:scale-105"
+                  className="rm-btn rm-btn--block"
                 >
-                  Block User
+                  <FiSlash size={13} /> Block User
                 </button>
               )}
             </div>
           </div>
         ))}
+
+        {!loading && reports.length === 0 && (
+          <div className="rm-empty">No reports to review.</div>
+        )}
       </div>
 
-      {/* Chat Viewer */}
+      {/* Chat viewer */}
       {activeSession && (
-        <div className="mt-8 p-6 bg-blue-100 rounded-lg shadow-inner transition-opacity duration-300">
-          <h3 className="text-xl font-bold text-blue-900 mb-4 text-left">
-            Chat History for Session <span className="font-mono text-blue-700">{activeSession}</span>
-          </h3>
+        <div className="rm-chat-panel">
+          <div className="rm-card-bar" />
+          <div className="rm-chat-header">
+            <h3 className="rm-chat-title">Chat History</h3>
+            <span className="rm-chat-session-id">{activeSession}</span>
+            <button className="rm-chat-close" onClick={() => setActiveSession('')}>
+              <FiX size={15} />
+            </button>
+          </div>
 
-          {loadingChats && <p className="text-gray-600 animate-pulse">Loading chats…</p>}
-          {errorChats && <p className="text-red-500">{errorChats}</p>}
+          {loadingChats && (
+            <div className="rm-state rm-state--sm">
+              <div className="rm-spinner" /><span>Loading chats…</span>
+            </div>
+          )}
+          {errorChats && (
+            <div className="rm-banner rm-banner--error">
+              <span className="rm-banner-dot" />{errorChats}
+            </div>
+          )}
 
-          <div className="max-h-96 overflow-y-auto space-y-4">
+          <div className="rm-chat-list">
             {sessionChats.map(msg => (
-              <div
-                key={msg._id}
-                className={`p-3 rounded-lg shadow ${
-                  msg.senderId._id === msg.receiverId._id ? 'bg-blue-200' : 'bg-white'
-                }`}
-              >
-                <div className="flex justify-between text-sm text-gray-600 mb-1">
-                  <span className="font-bold">{msg.senderId.name}</span>
-                  <span>{new Date(msg.timestamp).toLocaleString()}</span>
+              <div key={msg._id} className="rm-msg">
+                <div className="rm-msg-header">
+                  <span className="rm-msg-sender">{msg.senderId.name}</span>
+                  <span className="rm-msg-time">
+                    {new Date(msg.timestamp).toLocaleString()}
+                  </span>
                 </div>
-                {msg.content && <p className="text-gray-800">{msg.content}</p>}
+                {msg.content && <p className="rm-msg-content">{msg.content}</p>}
                 {msg.mediaUrl && msg.mediaType === 'image' && (
-                  <img
-                    src={msg.mediaUrl}
-                    alt="attachment"
-                    className="mt-2 max-w-full rounded shadow"
-                  />
+                  <img src={msg.mediaUrl} alt="attachment" className="rm-msg-img" />
                 )}
               </div>
             ))}
             {!sessionChats.length && !loadingChats && (
-              <p className="text-gray-500">No messages found for this session.</p>
+              <p className="rm-empty">No messages found for this session.</p>
             )}
           </div>
         </div>

@@ -1,77 +1,88 @@
 import React, { useEffect, useState } from "react";
 import "./Background.css";
 
-const colors = [
-  ["from-white/70", "to-blue-100"],
-  ["from-white/80", "to-sky-100"],
-  ["from-blue-50", "to-white/60"],
-  ["from-sky-100", "to-blue-100"],
-  ["from-cyan-100", "to-blue-50"],
-  ["from-blue-100", "to-blue-200"],
-  ["from-white/60", "to-cyan-100"],
-];
+const generateOrbs = (count = 18) =>
+  Array.from({ length: count }, (_, i) => ({
+    top:      `${Math.random() * 100}%`,
+    left:     `${Math.random() * 100}%`,
+    size:     Math.floor(Math.random() * 260 + 120),
+    delay:    `${(Math.random() * 6).toFixed(1)}s`,
+    duration: `${(20 + Math.random() * 14).toFixed(1)}s`,
+    opacity:  +(0.12 + Math.random() * 0.14).toFixed(2),
+    variant:  i % 3, // 0 = indigo, 1 = violet, 2 = blue
+  }));
 
-const depths = [
-  { z: "z-0", blur: "blur-md", opacity: 0.3 },
-  { z: "z-10", blur: "blur-lg", opacity: 0.45 },
-  { z: "z-20", blur: "blur-2xl", opacity: 0.6 },
-];
+const orbs = generateOrbs();
 
-const generateCircles = (count = 30) => {
-  return Array.from({ length: count }, () => {
-    const depth = depths[Math.floor(Math.random() * depths.length)];
-    return {
-      top: `${Math.random() * 100}%`,
-      left: `${Math.random() * 100}%`,
-      size: Math.floor(Math.random() * 180 + 80),
-      colors: colors[Math.floor(Math.random() * colors.length)],
-      delay: `${(Math.random() * 5).toFixed(1)}s`,
-      duration: `${(18 + Math.random() * 10).toFixed(1)}s`,
-      blur: depth.blur,
-      z: depth.z,
-      opacity: depth.opacity,
-    };
-  });
-};
+// Tiny star particles
+const generateStars = (count = 40) =>
+  Array.from({ length: count }, () => ({
+    top:      `${Math.random() * 100}%`,
+    left:     `${Math.random() * 100}%`,
+    size:     Math.floor(Math.random() * 2 + 1),
+    delay:    `${(Math.random() * 4).toFixed(1)}s`,
+    duration: `${(3 + Math.random() * 4).toFixed(1)}s`,
+    opacity:  +(0.2 + Math.random() * 0.5).toFixed(2),
+  }));
 
-const circles = generateCircles();
+const stars = generateStars();
 
 const Background = () => {
-  const [sparkTrigger, setSparkTrigger] = useState(false);
+  const [pulse, setPulse] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setSparkTrigger(true);
-      setTimeout(() => setSparkTrigger(false), 800); // Match spark animation duration
-    }, Math.random() * 1000 + 2000); // Every 2–3 seconds
-
+      setPulse(true);
+      setTimeout(() => setPulse(false), 900);
+    }, Math.random() * 1000 + 2500);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600">
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,0.04),_transparent)] mix-blend-overlay" />
+    <div className="bg-root">
+      {/* Deep base gradient */}
+      <div className="bg-base" />
 
-      {circles.map((circle, index) => (
+      {/* Animated grid */}
+      <div className="bg-grid" />
+
+      {/* Large ambient orbs */}
+      {orbs.map((orb, i) => (
         <div
-          key={index}
-          className={`
-            absolute rounded-full bg-gradient-to-br 
-            ${circle.colors.join(" ")} shimmer 
-            ${circle.blur} ${circle.z}
-            ${sparkTrigger ? "spark" : ""}
-          `}
+          key={i}
+          className={`bg-orb bg-orb--${orb.variant} ${pulse ? 'bg-orb--pulse' : ''}`}
           style={{
-            width: `${circle.size}px`,
-            height: `${circle.size}px`,
-            top: circle.top,
-            left: circle.left,
-            opacity: circle.opacity,
-            animation: `floatXY ${circle.duration} cubic-bezier(0.45, 0, 0.55, 1) infinite`,
-            animationDelay: circle.delay,
+            width:          `${orb.size}px`,
+            height:         `${orb.size}px`,
+            top:            orb.top,
+            left:           orb.left,
+            opacity:        orb.opacity,
+            animationDuration: orb.duration,
+            animationDelay:    orb.delay,
           }}
         />
       ))}
+
+      {/* Star particles */}
+      {stars.map((s, i) => (
+        <div
+          key={`s${i}`}
+          className="bg-star"
+          style={{
+            width:             `${s.size}px`,
+            height:            `${s.size}px`,
+            top:               s.top,
+            left:              s.left,
+            opacity:           s.opacity,
+            animationDuration: s.duration,
+            animationDelay:    s.delay,
+          }}
+        />
+      ))}
+
+      {/* Corner glow accents */}
+      <div className="bg-accent bg-accent--tr" />
+      <div className="bg-accent bg-accent--bl" />
     </div>
   );
 };

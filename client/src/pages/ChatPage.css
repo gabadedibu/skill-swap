@@ -195,6 +195,32 @@
   position: relative;
 }
 
+/* ── Meeting banner ── */
+.chat-meeting-banner {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 100px;
+  padding: 5px 14px;
+}
+
+.chat-zoom-link {
+  color: #818cf8;
+  font-weight: 500;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.chat-zoom-link:hover {
+  color: #a5b4fc;
+}
+
 /* ── Chat header ── */
 .chat-header {
   margin-bottom: 16px;

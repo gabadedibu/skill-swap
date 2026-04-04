@@ -17,6 +17,7 @@ const ChatPage = () => {
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [scheduledDate, setScheduledDate] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
+  const [zoomLink, setZoomLink] = useState('');         // ✅ zoom link state
   const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(null);
   const [notificationSocket, setNotificationSocket] = useState(null);
@@ -37,7 +38,7 @@ const ChatPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Fetch accepted session connections
+  // Fetch connections
   useEffect(() => {
     const fetchConnections = async () => {
       const token = localStorage.getItem('token');
@@ -57,7 +58,7 @@ const ChatPage = () => {
     fetchConnections();
   }, [sessionId]);
 
-  // Socket.io chat connection
+  // Socket connection
   useEffect(() => {
     if (!sessionId) return;
     const socketIo = io('https://skill-swap-9y9h.onrender.com/sessions', {
@@ -69,7 +70,6 @@ const ChatPage = () => {
 
     socketIo.on('receive_message', (data) => {
       if (data.isSystem) {
-        // ✅ System message (meeting reminder)
         setMessages((prev) => [...prev, {
           content: data.content,
           senderName: 'System',
@@ -77,7 +77,6 @@ const ChatPage = () => {
           senderId: null,
         }]);
       } else if (data.sender && data.receiver) {
-        // ✅ Regular user message
         setMessages((prev) => [...prev, {
           ...data,
           senderName: data.sender.name,
@@ -96,14 +95,14 @@ const ChatPage = () => {
     const socketIoNotification = io('https://skill-swap-9y9h.onrender.com/notifications', {
       transports: ['websocket'],
     });
-    socketIoNotification.on('connect', () => console.log('Notification WebSocket connected'));
+    socketIoNotification.on('connect', () => console.log('Notification socket connected'));
     setNotificationSocket(socketIoNotification);
     const userId = JSON.parse(localStorage.getItem('user'))._id;
     socketIoNotification.emit('subscribeToNotifications', userId);
     return () => socketIoNotification.disconnect();
   }, []);
 
-  // Fetch messages for selected connection
+  // Fetch messages
   useEffect(() => {
     if (!selectedConnection) return;
     const fetchMessages = async () => {
@@ -117,7 +116,7 @@ const ChatPage = () => {
           ...msg,
           senderName: msg.senderId?.name || 'System',
           receiverName: msg.receiverId?.name || 'Unknown',
-          // ✅ Mark as system if senderId is null
+          // ✅ Mark as system if senderId is null (meeting reminder messages)
           isSystem: !msg.senderId,
         })));
       } catch (err) {
@@ -132,7 +131,6 @@ const ChatPage = () => {
     navigate(`/chat/${connection._id}`);
   };
 
-  // ✅ FIX: Now accepts 3 args — message, file, link
   const handleSendMessage = (message, file, link) => {
     if (selectedConnection?.status === 'completed' || selectedConnection?.status === 'canceled') {
       alert('You cannot send messages for completed or canceled sessions.');
@@ -164,15 +162,24 @@ const ChatPage = () => {
     }).catch((err) => console.error('Error sending message:', err));
   };
 
+  // ✅ Now sends zoomLink to backend
   const handleScheduleSession = async () => {
     const token = localStorage.getItem('token');
     try {
       await axios.post(
         'https://skill-swap-9y9h.onrender.com/api/sessions/schedule',
-        { sessionId, newMeetingDate: scheduledDate, newMeetingTime: scheduledTime },
+        {
+          sessionId,
+          newMeetingDate: scheduledDate,
+          newMeetingTime: scheduledTime,
+          zoomLink,                          // ✅ include zoom link
+        },
         { headers: { 'x-auth-token': token } }
       );
       setIsScheduleModalOpen(false);
+      setZoomLink('');
+      setScheduledDate('');
+      setScheduledTime('');
     } catch (error) {
       console.error('Error scheduling session:', error);
     }
@@ -227,8 +234,6 @@ const ChatPage = () => {
     }
   };
 
-  const isUser1 = selectedConnection?.userId1?._id === loggedInUser?._id;
-  const isUser2 = selectedConnection?.userId2?._id === loggedInUser?._id;
   const bothUsersProvidedFeedback = selectedConnection?.feedbackByUser1 && selectedConnection?.feedbackByUser2;
   const isSessionCompletedOrCanceled = selectedConnection?.status === 'completed' || selectedConnection?.status === 'canceled';
   const isChatBlocked = isSessionCompletedOrCanceled && bothUsersProvidedFeedback;
@@ -274,7 +279,7 @@ const ChatPage = () => {
                   onClick={() => { handleSelectConnection(connection); setIsMenuOpen(false); }}
                 >
                   <p className="chat-conn-name">{getOtherUserName(connection)}</p>
-                  <p className="chat-conn-skill">Skill: {connection.skill || 'Eclipse OCL'}</p>
+                  <p className="chat-conn-skill">Skill: {connection.skill || 'N/A'}</p>
                   <p className="chat-conn-date">{formatDate(connection.sessionDate)} at {connection.sessionTime}</p>
                 </div>
               ))
@@ -290,7 +295,17 @@ const ChatPage = () => {
             <>
               <div className="chat-header">
                 <h2 className="chat-header-name">Chat with {getChatUserName()}</h2>
-                <p className="chat-header-skill">Skill: {selectedConnection.skill || 'Eclipse OCL'}</p>
+                <p className="chat-header-skill">Skill: {selectedConnection.skill || 'N/A'}</p>
+
+                {/* ✅ Show scheduled meeting info if set */}
+                {selectedConnection.newMeetingDate && selectedConnection.newMeetingTime && (
+                  <div className="chat-meeting-banner">
+                    📅 Next meeting: <strong>{new Date(selectedConnection.newMeetingDate).toLocaleDateString()}</strong> at <strong>{selectedConnection.newMeetingTime}</strong>
+                    {selectedConnection.zoomLink && (
+                      <> — <a href={selectedConnection.zoomLink} target="_blank" rel="noreferrer" className="chat-zoom-link">Join Zoom</a></>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="chat-messages">
@@ -319,7 +334,6 @@ const ChatPage = () => {
                 </div>
               )}
 
-              {/* ✅ Pass loggedInUserId to MessageInput isn't needed but pass it to history if used */}
               {!isChatBlocked && <MessageInput sendMessage={handleSendMessage} />}
 
               <div className="chat-actions">
@@ -373,19 +387,33 @@ const ChatPage = () => {
         </div>
       )}
 
-      {/* Schedule Modal */}
+      {/* ✅ Schedule Modal — now includes Zoom link field */}
       {isScheduleModalOpen && (
         <div className="chat-modal-overlay">
           <div className="chat-modal">
             <div className="chat-modal-bar" />
             <button className="chat-modal-close" onClick={() => setIsScheduleModalOpen(false)}>&times;</button>
             <h3 className="chat-modal-title">Schedule Next Meeting</h3>
+
             <label className="chat-modal-label">Select Date
               <input type="date" className="chat-modal-input" value={scheduledDate} onChange={(e) => setScheduledDate(e.target.value)} />
             </label>
+
             <label className="chat-modal-label">Select Time
               <input type="time" className="chat-modal-input" value={scheduledTime} onChange={(e) => setScheduledTime(e.target.value)} />
             </label>
+
+            <label className="chat-modal-label">
+              Zoom / Meeting Link <span style={{ opacity: 0.4 }}>(optional — will be sent to chat at meeting time)</span>
+              <input
+                type="url"
+                className="chat-modal-input"
+                value={zoomLink}
+                onChange={(e) => setZoomLink(e.target.value)}
+                placeholder="https://zoom.us/j/..."
+              />
+            </label>
+
             <button className="chat-modal-btn" onClick={handleScheduleSession}>Confirm Schedule</button>
           </div>
         </div>
