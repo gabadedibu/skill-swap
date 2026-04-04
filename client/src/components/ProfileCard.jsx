@@ -7,7 +7,7 @@ export default function ProfileCard({ user }) {
       <div className="relative">
         <img
           className="mx-auto h-32 w-32 rounded-full object-cover border-4 border-white shadow-lg"
-          src={user?.profilePicture ? `http://localhost:5000/uploads/profile-pictures/${user.profilePicture}` : '/default-avatar.png'}
+          src={user?.profilePicture ? `https://skill-swap-9y9h.onrender.com/uploads/profile-pictures/${user.profilePicture}` : '/default-avatar.png'}
           alt="Avatar"
         />
       </div>

@@ -34,7 +34,7 @@ const SkillMatchingPage = () => {
       }
 
       try {
-        const response = await axios.get('http://localhost:5000/api/matches', {
+        const response = await axios.get('https://skill-swap-9y9h.onrender.com/api/matches', {
           headers: { 'x-auth-token': token },
         });
 
@@ -43,7 +43,7 @@ const SkillMatchingPage = () => {
 
         const ratingsPromises = response.data.map(async (match) => {
           const userId = match.user._id;
-          const ratingResponse = await axios.get(`http://localhost:5000/api/sessions/ratings/${userId}`, {
+          const ratingResponse = await axios.get(`https://skill-swap-9y9h.onrender.com/api/sessions/ratings/${userId}`, {
             headers: { 'x-auth-token': token },
           });
           return { userId, averageRating: ratingResponse.data.averageRating };
@@ -114,13 +114,13 @@ const SkillMatchingPage = () => {
 
     try {
       await axios.post(
-        'http://localhost:5000/api/sessions/request',
+        'https://skill-swap-9y9h.onrender.com/api/sessions/request',
         { userId2: userId, sessionDate: date, sessionTime: time, skill },
         { headers: { 'x-auth-token': token } }
       );
 
       await axios.post(
-        'http://localhost:5000/api/notifications/send',
+        'https://skill-swap-9y9h.onrender.com/api/notifications/send',
         {
           userId,
           message: `You have a new session request for ${skill} on ${date} at ${time}`,
@@ -203,7 +203,7 @@ const SkillMatchingPage = () => {
                       <img
                         className="smp-avatar"
                         src={match.user?.profilePicture
-                          ? `http://localhost:5000/uploads/profile-pictures/${match.user.profilePicture}`
+                          ? `https://skill-swap-9y9h.onrender.com/uploads/profile-pictures/${match.user.profilePicture}`
                           : '/default-avatar.png'}
                         alt="Avatar"
                       />

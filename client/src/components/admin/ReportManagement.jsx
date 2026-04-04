@@ -112,12 +112,12 @@ const ReportManagement = () => {
                 <div>
                   <span className="font-bold">Screenshot:</span>
                   <a
-                    href={`http://localhost:5000${r.screenshot}`}
+                    href={`https://skill-swap-9y9h.onrender.com${r.screenshot}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     <img
-                      src={`http://localhost:5000${r.screenshot}`}
+                      src={`https://skill-swap-9y9h.onrender.com${r.screenshot}`}
                       alt="Report screenshot"
                       className="mt-2 w-32 h-32 object-cover rounded border-2 border-white shadow"
                     />

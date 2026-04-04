@@ -31,7 +31,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
 
         {/* 🆕 About Us Route */}
-        <Route path="/about-us" element={<AboutUsPage />} />
+        {/* <Route path="/about-us" element={<AboutUsPage />} /> */}
 
         {/* Protected User Routes */}
         <Route

@@ -41,7 +41,7 @@ const ProfileSettingsPage = () => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('token');
       try {
-        const res = await axios.get('http://localhost:5000/api/users/profile', {
+        const res = await axios.get('https://skill-swap-9y9h.onrender.com/api/users/profile', {
           headers: { 'x-auth-token': token }
         });
         const data = res.data;
@@ -54,7 +54,7 @@ const ProfileSettingsPage = () => {
           skillsToLearn: data.skillsToLearn ? data.skillsToLearn.join(', ') : ''
         });
         if (data.profilePicture) {
-          setImagePreview(`http://localhost:5000/uploads/profile-pictures/${data.profilePicture}`);
+          setImagePreview(`https://skill-swap-9y9h.onrender.com/uploads/profile-pictures/${data.profilePicture}`);
         }
       } catch {
         setMessage('Failed to load profile data.');
@@ -67,7 +67,7 @@ const ProfileSettingsPage = () => {
   const avatarSrc = imagePreview
     ? imagePreview
     : formData.profilePicture
-    ? `http://localhost:5000/uploads/profile-pictures/${formData.profilePicture}`
+    ? `https://skill-swap-9y9h.onrender.com/uploads/profile-pictures/${formData.profilePicture}`
     : defaultAvatar;
 
   const handleUpdate = async () => {
@@ -91,7 +91,7 @@ const ProfileSettingsPage = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.put('http://localhost:5000/api/users/profile', payload, {
+      const res = await axios.put('https://skill-swap-9y9h.onrender.com/api/users/profile', payload, {
         headers: { 'x-auth-token': token, 'Content-Type': 'multipart/form-data' }
       });
       dispatch(setUser(res.data));
@@ -113,7 +113,7 @@ const ProfileSettingsPage = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        'http://localhost:5000/api/users/change-password',
+        'https://skill-swap-9y9h.onrender.com/api/users/change-password',
         { currentPassword: passwords.currentPassword, newPassword: passwords.newPassword },
         { headers: { 'x-auth-token': token } }
       );

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogOut } from 'lucide-react';
+import './Navbar.css';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -8,6 +9,13 @@ const Navbar = () => {
   const user = token ? JSON.parse(localStorage.getItem('user')) : null;
   const isAdmin = user?.role === 'admin';
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -16,59 +24,80 @@ const Navbar = () => {
   };
 
   const navLinkClass = ({ isActive }) =>
-    `block px-3 py-2 rounded-md transition-colors duration-300 font-semibold ${
-      isActive
-        ? 'text-blue-700 border-b-2 border-blue-700'
-        : 'text-white hover:text-blue-700'
-    }`;
+    `nav-link ${isActive ? 'nav-link--active' : ''}`;
 
   return (
-    <nav className="bg-white/20 backdrop-blur-lg border-b border-white/30 shadow-md text-white font-bold">
-      <div className="max-w-screen-xl mx-auto flex items-center justify-between p-4">
+    <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`}>
+      {/* Top shimmer line */}
+      <div className="navbar-shimmer" />
+
+      <div className="navbar-inner">
         {/* Logo */}
-        <NavLink to="/" className="text-3xl font-extrabold text-white drop-shadow-md">
-          SkillSwap
+        <NavLink to="/" className="navbar-logo">
+          Skill<span className="navbar-logo-accent">Swap</span>
         </NavLink>
 
-        {/* Hamburger menu button (mobile) */}
-        <div className="md:hidden">
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="focus:outline-none"
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+        {/* Desktop links */}
+        <div className="navbar-links">
+          <NavLink to="/" className={navLinkClass}>Home</NavLink>
+          {token ? (
+            <>
+              <NavLink to="/profile"        className={navLinkClass}>Profile</NavLink>
+              <NavLink to="/skill-matching" className={navLinkClass}>Skill Matching</NavLink>
+              <NavLink to="/chat"           className={navLinkClass}>Chat</NavLink>
+              {isAdmin && (
+                <NavLink to="/admin" className={navLinkClass}>Admin</NavLink>
+              )}
+            </>
+          ) : (
+            <>
+              <NavLink to="/login"    className={navLinkClass}>Login</NavLink>
+              <NavLink to="/register" className={navLinkClass}>Sign Up</NavLink>
+            </>
+          )}
         </div>
 
-        {/* Links container */}
-        <div className={`flex-1 justify-end items-center ${menuOpen ? 'block' : 'hidden'} md:flex`}>          
-          <div className="flex flex-col md:flex-row md:space-x-4 lg:space-x-8 text-xl">
-            <NavLink to="/" className={navLinkClass}>Home</NavLink>
-            {token ? (
-              <>                
-                <NavLink to="/profile" className={navLinkClass}>Profile</NavLink>
-                <NavLink to="/skill-matching" className={navLinkClass}>Skill Matching</NavLink>
-                <NavLink to="/chat" className={navLinkClass}>Chat</NavLink>
-                <NavLink to="/about-us" className={navLinkClass}>About Us</NavLink>
-                {isAdmin && (
-                  <NavLink to="/admin" className={navLinkClass}>Admin Dashboard</NavLink>
-                )}
-                <button
-                  onClick={handleLogout}
-                  className="mt-2 md:mt-0 bg-blue-700 px-4 py-2 rounded hover:bg-red-600 font-semibold text-white transition-colors duration-300"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <NavLink to="/login" className={navLinkClass}>Login</NavLink>
-                <NavLink to="/register" className={navLinkClass}>Sign Up</NavLink>
-              </>
-            )}
-          </div>
+        {/* Right side */}
+        <div className="navbar-right">
+          {token ? (
+            <button onClick={handleLogout} className="navbar-logout">
+              <LogOut size={15} />
+              <span>Logout</span>
+            </button>
+          ) : null}
+
+          {/* Mobile hamburger */}
+          <button
+            className="navbar-burger"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
+      </div>
+
+      {/* Mobile menu */}
+      <div className={`navbar-mobile ${menuOpen ? 'navbar-mobile--open' : ''}`}>
+        <NavLink to="/" className={navLinkClass} onClick={() => setMenuOpen(false)}>Home</NavLink>
+        {token ? (
+          <>
+            <NavLink to="/profile"        className={navLinkClass} onClick={() => setMenuOpen(false)}>Profile</NavLink>
+            <NavLink to="/skill-matching" className={navLinkClass} onClick={() => setMenuOpen(false)}>Skill Matching</NavLink>
+            <NavLink to="/chat"           className={navLinkClass} onClick={() => setMenuOpen(false)}>Chat</NavLink>
+            {isAdmin && (
+              <NavLink to="/admin" className={navLinkClass} onClick={() => setMenuOpen(false)}>Admin</NavLink>
+            )}
+            <button onClick={handleLogout} className="navbar-logout navbar-logout--mobile">
+              <LogOut size={14} /><span>Logout</span>
+            </button>
+          </>
+        ) : (
+          <>
+            <NavLink to="/login"    className={navLinkClass} onClick={() => setMenuOpen(false)}>Login</NavLink>
+            <NavLink to="/register" className={navLinkClass} onClick={() => setMenuOpen(false)}>Sign Up</NavLink>
+          </>
+        )}
       </div>
     </nav>
   );

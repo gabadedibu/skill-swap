@@ -1,17 +1,17 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
+import "./Footer.css";
 
 const Footer = () => {
   const internalLinks = [
-    { name: "Home", to: "/" },
-    { name: "Profile", to: "/profile" },
-    { name: "Login", to: "/login" },
-    { name: "Signup", to: "/register" },
-    { name: "Chat", to: "/chat" },
-    { name: "Skill Matching", to: "/skill-matching" },
-    { name: "Settings", to: "/profile-settings" },
-    { name: "About Us", to: "/about-us" },
+    { name: "Home",          to: "/" },
+    { name: "Profile",       to: "/profile" },
+    { name: "Login",         to: "/login" },
+    { name: "Sign Up",       to: "/register" },
+    { name: "Chat",          to: "/chat" },
+    { name: "Skill Matching",to: "/skill-matching" },
+    { name: "Settings",      to: "/profile-settings" },
   ];
 
   useEffect(() => {
@@ -19,68 +19,64 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer className="bg-white/80 backdrop-blur border-t border-blue-200 shadow-inner text-blue-900">
-      <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 sm:grid-cols-3 gap-8 text-sm md:text-base">
+    <footer className="footer">
+      {/* Top shimmer */}
+      <div className="footer-shimmer" />
 
+      <div className="footer-inner">
         {/* Brand */}
-        <div>
-          <h2 className="text-xl font-bold text-indigo-600 mb-3">Skill Swap</h2>
-          <p className="text-gray-600">
+        <div className="footer-brand">
+          <span className="footer-logo">
+            Skill<span className="footer-logo-accent">Swap</span>
+          </span>
+          <p className="footer-brand-desc">
             A collaborative platform for peer-to-peer learning and skill development.
           </p>
+          {/* Social icons */}
+          <div className="footer-socials">
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="footer-social">
+              <FaGithub />
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="footer-social">
+              <FaLinkedin />
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="footer-social">
+              <FaTwitter />
+            </a>
+          </div>
         </div>
 
         {/* Quick Links */}
-        <div>
-          <h3 className="font-semibold text-gray-700 mb-2">Quick Links</h3>
-          <div className="grid grid-cols-2 gap-2">
+        <div className="footer-links-col">
+          <h3 className="footer-col-title">Quick Links</h3>
+          <div className="footer-links-grid">
             {internalLinks.map(({ name, to }) => (
-              <Link
-                key={name}
-                to={to}
-                className="hover:text-indigo-600 transition duration-300"
-              >
+              <Link key={name} to={to} className="footer-link">
+                <span className="footer-link-dot" />
                 {name}
               </Link>
             ))}
           </div>
         </div>
 
-        {/* Social */}
-        <div className="flex flex-col">
-          <h3 className="text-left font-semibold text-gray-700 mb-2">Connect with us</h3>
-          <div className="flex space-x-4 mt-2 items-center">
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-600 hover:text-black transition transform hover:scale-110"
-            >
-              <FaGithub size={20} />
-            </a>
-            <a
-              href="https://linkedin.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-600 hover:text-blue-700 transition transform hover:scale-110"
-            >
-              <FaLinkedin size={20} />
-            </a>
-            <a
-              href="https://twitter.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-600 hover:text-sky-500 transition transform hover:scale-110"
-            >
-              <FaTwitter size={20} />
-            </a>
+        {/* Tagline / connect */}
+        <div className="footer-connect-col">
+          <h3 className="footer-col-title">About</h3>
+          <p className="footer-connect-text">
+            SkillSwap connects curious minds. Teach what you know, learn what you love — together.
+          </p>
+          <div className="footer-eyebrow">
+            <span className="footer-eyebrow-dot" />
+            Peer-to-Peer Learning
           </div>
         </div>
-
       </div>
 
-      <div className="text-center text-gray-500 text-xs py-4 border-t border-gray-200">
-        © {new Date().getFullYear()} Skill Swap. All rights reserved.
+      {/* Bottom bar */}
+      <div className="footer-bottom">
+        <span>© {new Date().getFullYear()} Skill Swap. All rights reserved.</span>
+        <span className="footer-bottom-sep">·</span>
+        <span>Built with passion for learners everywhere.</span>
       </div>
     </footer>
   );

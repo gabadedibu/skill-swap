@@ -32,7 +32,7 @@ const UserCard = React.memo(({ user, rank }) => {
   const pictureUrl = useMemo(
     () =>
       profilePicture
-        ? `http://localhost:5000/uploads/profile-pictures/${profilePicture}`
+        ? `https://skill-swap-9y9h.onrender.com/uploads/profile-pictures/${profilePicture}`
         : defaultAvatar,
     [profilePicture]
   );

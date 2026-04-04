@@ -177,7 +177,7 @@ const AdminProfile = () => {
                     src={
                       profileImage
                         ? form.profilePicture
-                        : `http://localhost:5000/uploads/${form.profilePicture}`
+                        : `https://skill-swap-9y9h.onrender.com/uploads/${form.profilePicture}`
                     }
                     alt="Profile Preview"
                     className="w-20 h-20 rounded-full object-cover mx-auto"

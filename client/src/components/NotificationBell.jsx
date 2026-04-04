@@ -12,7 +12,7 @@ const NotificationBell = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
-    const socket = io('http://localhost:5000/notifications');
+    const socket = io('https://skill-swap-9y9h.onrender.com/notifications');
     socket.on('new_notification', (notification) => {
       dispatch(setNotifications([notification]));
     });

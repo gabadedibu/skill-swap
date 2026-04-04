@@ -21,7 +21,7 @@ const AdminDashboardPage = () => {
   const profileImage = user?.profilePicture
     ? user.profilePicture.startsWith('http')
       ? user.profilePicture
-      : `http://localhost:5000/uploads/${user.profilePicture}`
+      : `https://skill-swap-9y9h.onrender.com/uploads/${user.profilePicture}`
     : 'https://placehold.co/150x150?text=Admin';
 
   return (

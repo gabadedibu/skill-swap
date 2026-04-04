@@ -15,7 +15,7 @@ const NotificationDropdown = () => {
 
     // Persist the update to the backend
     const token = localStorage.getItem('token');
-    axios.patch(`http://localhost:5000/api/notifications/${id}/read`, {}, {
+    axios.patch(`https://skill-swap-9y9h.onrender.com/api/notifications/${id}/read`, {}, {
       headers: { 'x-auth-token': token },
     }).catch((err) => {
       console.error('Error updating read status in backend:', err.message);
@@ -29,7 +29,7 @@ const NotificationDropdown = () => {
 
         // Persist the change to the backend
         const token = localStorage.getItem('token');
-        axios.patch(`http://localhost:5000/api/notifications/${notification._id}/read`, {}, {
+        axios.patch(`https://skill-swap-9y9h.onrender.com/api/notifications/${notification._id}/read`, {}, {
           headers: { 'x-auth-token': token },
         }).catch((err) => {
           console.error('Error marking all notifications as read:', err.message);

@@ -43,7 +43,7 @@ const LoginPage = () => {
 
     dispatch(loginStart());
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", {
+      const response = await axios.post("https://skill-swap-9y9h.onrender.com/api/auth/login", {
         email,
         password,
       });

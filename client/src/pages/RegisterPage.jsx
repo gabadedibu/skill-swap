@@ -42,7 +42,7 @@ const RegisterPage = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        "https://skill-swap-9y9h.onrender.com/api/auth/register",
         { name, email, password }
       );
       setSuccessMessage("Registration successful! Please log in.");
