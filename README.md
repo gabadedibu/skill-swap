@@ -1,193 +1,225 @@
----
+## 🌐 Live Demo
 https://skill-swap-virid.vercel.app/
 # SkillSwap
 
-## Project Overview
+## 📌 Project Overview
 
-SkillSwap is a web-based platform where users can exchange skills instead of money. Users can list the skills they offer and the skills they want to learn, and the platform will recommend them suitable partners. This system creates a collaborative and cost-effective learning environment.
+SkillSwap is a web-based platform where users exchange skills instead of money. Users can list the skills they offer and the skills they want to learn, and the platform recommends suitable partners—creating a collaborative and cost-effective learning environment.
 
-For instance, a web developer can offer to teach React.js in exchange for learning video editing from another user. The platform provides structured, yet flexible skill exchanges based on users' interests and availability.
+For example, a web developer can teach React.js in exchange for learning video editing from another user. The platform enables structured yet flexible skill exchanges based on interests and availability.
 
-## Table of Contents
+---
 
-1. [Technologies Used](#technologies-used)
-2. [Features](#features)
-3. [Getting Started](#getting-started)
-4. [Installation](#installation)
-5. [How to Use](#how-to-use)
-6. [Contributing](#contributing)
-7. [License](#license)
+## 📚 Table of Contents
 
-## Technologies Used
+* Technologies Used
+* Features
+* Getting Started
+* Installation
+* Environment Variables
+* Running the Application
+* How to Use
+* Contributing
+* License
 
-* **Frontend:**
+---
 
-  * React.js
-  * Redux for state management
-  * Vite for bundling
-  * TailwindCSS for styling
-  * Socket.io for real-time messaging
-  * Framer Motion for animations
+## 🛠️ Technologies Used
 
-* **Backend:**
+### Frontend
 
-  * Node.js
-  * Express.js
-  * MongoDB for database
-  * Mongoose for database interaction
-  * JWT for authentication
-  * bcrypt for password hashing
-  * Multer for handling file uploads
+* React.js
+* Redux (State Management)
+* Vite (Bundler)
+* TailwindCSS (Styling)
+* Socket.io (Real-time communication)
+* Framer Motion (Animations)
 
-## Features
+### Backend
 
-1. **User Authentication**
+* Node.js
+* Express.js
+* MongoDB
+* Mongoose
+* JWT (Authentication)
+* bcrypt (Password hashing)
+* Multer (File uploads)
 
-   * Sign-in/Sign-up via email or social authentication
-   * Role-based authentication
+---
 
-2. **User Profile & Skill Management**
+## 🚀 Features
 
-   * Profile creation and updates
-   * List skills users can teach and want to learn
-   * Display user rating and past exchanges
+### 🔐 User Authentication
 
-3. **Skill Matching Algorithm**
+* Sign-up / Login (Email or Social Auth)
+* Role-based access control
 
-   * Suggest users based on skill demand and availability
-   * Uses an intelligent algorithm for optimized matching
+### 👤 User Profile & Skill Management
 
-4. **Real-Time Chat & Messaging System**
+* Create and update profile
+* Add skills you can teach and learn
+* View ratings and past exchanges
 
-   * Real-time chat for communication
-   * Session scheduling within the chat
-   * Media sharing for learning materials
+### 🤝 Skill Matching Algorithm
 
-5. **Session Booking System**
+* Matches users based on skills and availability
+* Optimized recommendations system
 
-   * Users can book and manage sessions
-   * Calendar integration for scheduling
-   * In-app notifications and reminders for sessions
+### 💬 Real-Time Chat System
 
-6. **Peer Rating & Reviews**
+* Instant messaging using Socket.io
+* Share media (images, videos, audio)
+* Schedule sessions directly in chat
 
-   * Users can rate and review their exchange partners
-   * Ensures quality control and prevents misuse
+### 📅 Session Booking System
 
-7. **Learning Progress Tracking**
+* Book and manage learning sessions
+* Calendar-based scheduling
+* Notifications and reminders
 
-   * Users can mark sessions as completed
-   * Track progress and history
-   * Personalized recommendations
+### ⭐ Peer Ratings & Reviews
 
-8. **Admin Dashboard**
+* Rate and review users after sessions
+* Helps maintain quality and trust
 
-   * Admin controls to manage users, reports, and disputes
-   * Monitor platform analytics and engagement statistics
+### 📊 Learning Progress Tracking
 
-## Getting Started
+* Track completed sessions
+* View learning history
+* Personalized recommendations
 
-These instructions will guide you to set up and run the project locally. Make sure you have [Node.js](https://nodejs.org/) and [MongoDB](https://www.mongodb.com/) installed on your machine. You will also need a code editor like [VS Code](https://code.visualstudio.com/).
+### 🛠️ Admin Dashboard
 
-### Prerequisites
+* Manage users and reports
+* Handle disputes
+* Monitor platform analytics
 
-1. Clone the repository:
+---
 
-   ```bash
-   git clone https://github.com/ahmadwyne/skill-swap.git
-   ```
+## ⚙️ Getting Started
 
-2. Install dependencies for both the backend and frontend.
+Make sure you have the following installed:
 
-### Installation
+* Node.js
+* MongoDB
+* Git
+* VS Code (recommended)
 
-1. **Backend Setup:**
+Clone the repository:
 
-   * Go to the backend directory:
+```bash
+git clone https://github.com/gabadedibu/skill-swap.git
+cd skill-swap
+```
 
-     ```bash
-     cd skill-swap/backend
-     ```
-   * Install the required dependencies:
+---
 
-     ```bash
-     npm install
-     ```
+## 📥 Installation
 
-2. **Frontend Setup:**
+### Backend Setup
 
-   * Go to the frontend directory:
+```bash
+cd backend
+npm install
+```
 
-     ```bash
-     cd skill-swap/client
-     ```
-   * Install the required dependencies:
+### Frontend Setup
 
-     ```bash
-     npm install
-     ```
+```bash
+cd client
+npm install
+```
 
-3. **Environment Variables:**
+---
 
-   * Create a `.env` file in `backend` directory with the following content:
+## 🔑 Environment Variables
 
-     * For **backend**:
+Create a `.env` file inside the **backend** folder:
 
-       ```
-       MONGO_URI=<Your MongoDB URI>
-       JWT_SECRET=<Your JWT Secret>
-       ADMIN_EMAIL=<Your Admin Email>
-       ADMIN_PASSWORD=<Your Admin Password>
-       ```
+```env
+MONGO_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
+ADMIN_EMAIL=your_admin_email
+ADMIN_PASSWORD=your_admin_password
 
-### Running the Application
 
-1. **Start the Backend:**
+## ▶️ Running the Application
 
-   * From the backend directory, run:
+### Start Backend
 
-     ```bash
-     npm start
-     ```
+```bash
+cd backend
+npm start
+```
 
-2. **Start the Frontend:**
+### Start Frontend
 
-   * From the frontend directory, run:
+```bash
+cd client
+npm run dev
+```
 
-     ```bash
-     npm run dev
-     ```
+App will run on:
 
-This will start both the backend and frontend locally. You can now open `http://localhost:5173` in your browser to access the SkillSwap application.
+```
+when you have successfully edited all
+## ⚠️ Notes
 
-## How to Use
+* Replace all instances of:
 
-1. **Sign Up / Log In:**
+  * `https://skill-swap-virid.vercel.app/` → with your deployed frontend
+  * `https://skill-swap-9y9h.onrender.com/` → with your deployed backend
+* Ensure CORS is properly configured on the backend for production
+http://localhost:5173
+```
 
-   * Create a new account by signing up with your email, or log in using your existing account credentials.
+---
 
-2. **Profile Setup:**
+## 📖 How to Use
 
-   * Update your profile with skills you want to teach and learn.
+### 1. Sign Up / Log In
 
-3. **Skill Matching:**
+Create an account or log in with existing credentials.
 
-   * Use the skill matching algorithm to find people you can teach or learn from.
+### 2. Set Up Profile
 
-4. **Real-Time Chat:**
+Add skills you want to teach and skills you want to learn.
 
-   * Start chatting with your session partner. You can also send multimedia files such as images, videos, and audio.
+### 3. Find Matches
 
-5. **Session Booking & Management:**
+Use the matching system to discover users for skill exchange.
 
-   * Schedule a session directly through the chat interface and track your progress.
+### 4. Chat in Real-Time
 
-6. **Feedback and Reviews:**
+Start conversations and share resources.
 
-   * After completing a session, provide feedback and a rating for your session partner.
+### 5. Book Sessions
 
-## License
+Schedule and manage sessions directly in the chat.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### 6. Leave Feedback
+
+Rate your experience after each session.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!
+
+1. Fork the repo
+2. Create a new branch
+3. Make your changes
+4. Submit a pull request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+
 
 ---
