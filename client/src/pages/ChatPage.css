@@ -10,6 +10,54 @@
   font-family: 'DM Sans', sans-serif;
   background: #050818;
 }
+/* ══════════════════════════════
+   RESPONSIVE
+══════════════════════════════ */
+@media (max-width: 768px) {
+  .chat-menu-btn {
+    display: flex;
+  }
+
+  /* ✅ FIX: use dvh so the chat fills only the truly visible viewport */
+  .chat-root {
+    height: 100dvh;       /* dynamic viewport height — accounts for browser chrome */
+    min-height: -webkit-fill-available; /* Safari fallback */
+  }
+
+  .chat-left {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 40;
+    transform: translateX(-100%);
+    width: 75%;
+    min-width: unset;
+  }
+
+  .chat-left.open {
+    transform: translateX(0);
+  }
+
+  .chat-backdrop.open {
+    display: block;
+  }
+
+  .chat-right {
+    padding: 16px;
+    padding-bottom: 24px;  /* ✅ breathing room above the input */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;         /* ✅ lets flex children shrink properly */
+  }
+
+  /* ✅ Make the messages area scrollable without overflowing */
+  .chat-messages {
+    flex: 1;
+    min-height: 0;         /* critical — without this flex children can overflow */
+    overflow-y: auto;
+  }
 
 /* ── Grid overlay ── */
 .chat-grid {
