@@ -8,6 +8,17 @@
   font-family: 'DM Sans', sans-serif;
   overflow: hidden;
 }
+@media (max-width: 768px) {
+  .footer-inner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 40px 24px 28px;
+  }
+
+  /* Add this — adjust 80px to match your button's height */
+  .footer {
+    padding-bottom: 80px;
+  }
 
 /* Grid texture */
 .footer::before {
